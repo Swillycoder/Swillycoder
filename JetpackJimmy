@@ -1,0 +1,554 @@
+# Finish off the colour selection screen, make a list within a list
+# create sprites in GIMP
+# map sprites to the selected colour
+
+
+import pygame
+import random
+
+pygame.init()
+
+# Constants
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 650
+
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Jetpack Jimmy")
+clock = pygame.time.Clock()
+#Load files
+jetpack_l_80px = pygame.image.load('jetpack_l_80px.png')
+jetpack_r_80px = pygame.image.load('jetpack_r_80px.png')
+#Jimmy colours
+#jimmy_redl = pygame.image.load('jimmy_redl.png')
+#jimmy_redr = pygame.image.load('jimmy_redr.png')
+#jimmy_yellowl = pygame.image.load('jimmy_yellowl.png')
+#jimmy_yellowr = pygame.image.load('jimmy_yellowr.png')
+#jimmy_greenl = pygame.image.load('jimmy_greenl.png')
+#jimmy_greenr = pygame.image.load('jimmy_greenr.png')
+#jimmy_bluel = pygame.image.load('jimmy_bluel.png')
+#jimmy_bluer = pygame.image.load('jimmy_bluer.png')
+asteroid_img = pygame.image.load('silverore.png')
+jet_img = pygame.image.load('jet4.png')
+jj_intro = pygame.image.load('jj_intro.png')
+jimmythanks = pygame.image.load('jimmyexit.png')
+bomb1_img = pygame.image.load('bomb1.png')
+bomb2_img = pygame.image.load('bomb2.png')
+bomb3_img = pygame.image.load('bomb3.png')
+bomb4_img = pygame.image.load('bomb4.png')
+bomb5_img = pygame.image.load('bomb5.png')
+blast_img = pygame.image.load('blast.png')
+blastanim_img1 = pygame.image.load('blast_anim1.png')
+blastanim_img2 = pygame.image.load('blast_anim2.png')
+blastanim_img3 = pygame.image.load('blast_anim3.png')
+blastanim_img4 = pygame.image.load('blast_anim4.png')
+firewall1_img = pygame.image.load('firewall1.png')
+firewall2_img = pygame.image.load('firewall2.png')
+winscreen_img1 = pygame.image.load('jj_win1.png')
+winscreen_img2 = pygame.image.load('jj_win2.png')
+winscreen_img3 = pygame.image.load('jj_win3.png')
+winscreen_img4 = pygame.image.load('jj_win4.png')
+winscreen_img5 = pygame.image.load('jj_win5.png')
+winscreen_img6 = pygame.image.load('jj_win6.png')
+winscreen_img7 = pygame.image.load('jj_win7.png')
+winscreen_img8 = pygame.image.load('jj_win8.png')
+winscreen_img9 = pygame.image.load('jj_win9.png')
+winscreen_img10 = pygame.image.load('jj_win10.png')
+jimmy_red = pygame.image.load('jimmy_red.png')
+jimmy_yellow = pygame.image.load('jimmy_yellow.png')
+jimmy_green = pygame.image.load('jimmy_green.png')
+jimmy_blue = pygame.image.load('jimmy_blue.png')
+#Fonts
+font = pygame.font.SysFont('impact', 30)
+#Groups
+player_group = pygame.sprite.GroupSingle()
+debris_group = pygame.sprite.Group()
+star_group = pygame.sprite.Group()
+collectibles_group = pygame.sprite.Group()
+misc_group = pygame.sprite.Group()
+#Constants
+bombs = 0
+boost = 0
+player_score = 0
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self, x, y, image):
+        super().__init__()
+        self.image = image
+        self.image_2 = jet_img
+        self.rect = self.image.get_rect(topleft = (x,y))
+        self.old_rect = self.rect.copy()
+        self.x = x
+        self.y = y
+        self.move_left = True
+        self.speed = 2
+
+    def collisions(self, direction):
+        collisions_sprites = pygame.sprite.spritecollide(self, debris_group, False,)
+        if collisions_sprites:
+            if direction == 'horizontal':
+                for sprite in collisions_sprites:
+                    if self.rect.right >= sprite.rect.left and self.old_rect.right <= sprite.old_rect.left:
+                        self.rect.right = sprite.rect.left
+                        self.x = self.rect.x
+                    if self.rect.left <= sprite.rect.right and self.old_rect.left >= sprite.old_rect.right:
+                        self.rect.left = sprite.rect.right
+                        self.x = self.rect.x
+
+            if direction == 'vertical':
+                for sprite in collisions_sprites:
+                    if self.rect.bottom >= sprite.rect.top and self.old_rect.bottom <= sprite.old_rect.top:
+                        self.rect.bottom = sprite.rect.top
+                        self.y = self.rect.y
+                    if self.rect.top <= sprite.rect.bottom and self.old_rect.top >= sprite.old_rect.bottom:
+                        self.rect.top = sprite.rect.bottom
+                        self.y = self.rect.y
+
+    def keys(self):
+        global bombs
+        keys = pygame.key.get_pressed()
+        if self.rect.left >= 0:
+            if keys[pygame.K_LEFT]:
+                self.move_left = True
+                self.image = jetpack_l_80px
+                self.x -= self.speed
+            
+        if self.rect.right <= 600:
+            if keys[pygame.K_RIGHT]:
+                self.image = jetpack_r_80px
+                self.x += self.speed
+                self.move_left = False
+
+        if self.rect.bottom <= 650:
+            if keys[pygame.K_DOWN]:
+                self.y += 4
+
+        if bombs >= 1:
+            if keys[pygame.K_UP]:
+                debris_group.empty()
+                screen.blit(blastanim_img1, (0,0))
+                pygame.display.update()
+                pygame.time.delay(50)
+                screen.blit(blastanim_img2, (0,0))
+                pygame.display.update()
+                pygame.time.delay(50)
+                screen.blit(blastanim_img3, (0,0))
+                pygame.display.update()
+                pygame.time.delay(50)
+                screen.blit(blastanim_img4, (0,0))
+                pygame.display.update()
+                pygame.time.delay(800)
+                bombs -= 1
+
+        if self.rect.bottom <= 670 and self.rect.top >= 0:
+            if keys[pygame.K_SPACE]:
+                screen.blit(self.image_2, (self.rect.x+12, self.rect.y+80 ))
+                self.y -= 4
+             
+    def update(self):
+        self.collisions('horizontal')
+        self.collisions('vertical')
+        self.keys()
+        self.old_rect = self.rect.copy()
+        self.y += 1
+        self.rect.topleft = (self.x, self.y )# Update the rect position based on self.x
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
+class Star(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface([3,3])
+        self.rect = self.image.get_rect(center = (x,y))
+        self.image.fill('white')
+        self.y = y
+        self.x = x
+    def update(self):
+        self.off_screen()
+        self.y += 10
+        self.rect.center = (self.x, self.y)
+    def draw(self):
+        screen.blit(self.image, self.rect)
+    def off_screen(self):
+        if self.rect.bottom >= 700:
+            star_group.remove(self)
+
+class Debris(pygame.sprite.Sprite):
+    def __init__(self, x, y, image):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect(topleft=(x,y))
+        #self.rect.inflate_ip(0, -20)
+        self.old_rect = self.rect.copy()
+    def off_screen(self):
+         global player_score
+         if self.rect.bottom >= 650:
+              debris_group.remove(self)
+              player_score += 1
+    def update(self):
+        self.off_screen()
+        self.rect.y += 3
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
+class Collectible(pygame.sprite.Sprite):
+    def __init__(self, x, y, pic1, pic2, pic3, pic4, pic5):
+        super().__init__()
+        self.sprites = []
+        self.sprites.append(pic1)
+        self.sprites.append(pic2)
+        self.sprites.append(pic3)
+        self.sprites.append(pic4)
+        self.sprites.append(pic5)
+        self.current_sprite = 0
+        self.image = self.sprites[self.current_sprite]
+        self.rect = self.image.get_rect(topleft=(x,y))
+    def off_screen(self):
+        if self.rect.bottom >= 650:
+              collectibles_group.remove(self)
+        if self.rect.left >= 600:
+            self.rect.right = 0
+    def update(self):
+        self.image = self.sprites[int(self.current_sprite)]
+        self.off_screen()
+        self.current_sprite += 0.1
+        if self.current_sprite >= 5:
+            self.current_sprite = 0
+        self.rect.y += 1
+        self.rect.x += 2
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
+class AnimObject(pygame.sprite.Sprite):
+    def __init__(self, x, y, pic1, pic2, pic3, pic4):
+        super().__init__()
+        self.sprites = []
+        self.sprites.append(pic1)
+        self.sprites.append(pic2)
+        self.sprites.append(pic3)
+        self.sprites.append(pic4)
+        self.current_sprite = 0
+        self.image = self.sprites[self.current_sprite]
+        self.rect = self.image.get_rect(topleft=(x,y))
+    def update(self):
+        self.image = self.sprites[int(self.current_sprite)]
+        self.current_sprite += 0.1
+        if self.current_sprite >= 4:
+            self.current_sprite = 0
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
+class Button(pygame.sprite.Sprite):
+    def __init__(self, x, y, colour, sprite_image):
+        super().__init__()
+        self.image = pygame.Surface((150,50))
+        self.placeholder_img = pygame.Surface((200,350))
+        self.sprite_image = sprite_image
+        self.font = pygame.font.SysFont('impact', 20)
+        self.rect = self.image.get_rect(topleft=(x,y))
+        self.placeholder_rect = self.placeholder_img.get_rect(topleft=(300,100))
+        self.sprite_image_rect = self.sprite_image.get_rect(topleft=(300,100))
+        self.image.fill(colour)
+        self.placeholder_img.fill(colour)
+        self.colour = colour
+        self.x = x
+        self.y = y
+
+    def update(self):
+        self.draw(screen)
+
+    def draw(self, screen, selected):
+        keys = pygame.key.get_pressed()
+        screen.blit(self.image, self.rect)
+        
+        if selected:
+            pygame.draw.rect(screen, (0,0,0), self.rect, 8)
+            screen.blit(self.placeholder_img, self.placeholder_rect)
+            screen.blit(self.sprite_image, self.sprite_image_rect)
+            pygame.draw.rect(screen, (0,0,0), self.placeholder_rect, 4)
+
+class GameState():
+    def __init__(self):
+        self.state = 'intro_screen'
+ 
+    def state_manager(self):
+        if self.state == 'intro_screen':
+            self.intro_screen()
+        if self.state == 'player_select_screen':
+            self.player_select_screen()
+        if self.state == 'main_screen':
+            self.main_screen()
+        if self.state == 'exit_screen':
+            self.exit_screen()
+        if self.state == 'win_screen':
+            self.win_screen()
+    def change_state(self, new_state):
+        self.state = new_state
+
+    def intro_screen(self):
+        pygame.display.set_caption("Welcome to JETPACK JIMMY")
+        
+        intro_running = True
+        while intro_running:
+            clock.tick(60)
+            screen.fill('black')
+            screen.blit(jj_intro, (50,0))
+            keys = pygame.key.get_pressed()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    quit()
+                if keys[pygame.K_g]:
+                    intro_running = False
+                    pygame.time.delay(500)
+                    self.change_state('player_select_screen')
+
+                if len(star_group) <= 0:
+                    for i in range(20):
+                        x = random.randint(0,600)
+                        y = random.randint(-1200,0)
+                        star = Star(x, y)
+                        star_group.add(star)
+                if len(star_group) <= 10:
+                    for i in range(20):
+                        x = random.randint(0,600)
+                        y = random.randint(-1200,0)
+                        star = Star(x, y)
+                        star_group.add(star)
+            star_group.update()
+            star_group.draw(screen)
+            pygame.display.update()
+    
+    def player_select_screen(self):
+        buttons = [
+    Button(100, 100, 'red', jimmy_red),
+    Button(100, 200, 'yellow', jimmy_yellow),
+    Button(100, 300, 'green', jimmy_green),
+    Button(100, 400, 'blue', jimmy_blue)
+        ]
+
+        screen.fill('black')
+        selected_button_index = 0
+
+        player_select_running = True
+        while player_select_running:
+            keys = pygame.key.get_pressed()
+            # Draw buttons
+            for i, button in enumerate(buttons):
+                if i == selected_button_index:
+                    button.draw(screen, True)
+                    if keys[pygame.K_SPACE]:
+                        player_select_running = False
+                        pygame.time.delay(1000)
+                        self.change_state('main_screen')
+                else:
+                    button.draw(screen, False)
+
+            for event in pygame.event.get():
+                
+                if event.type == pygame.QUIT:
+                    player_select_running = False
+                    quit()
+                
+                elif keys[pygame.K_UP]:
+                    screen.fill('black')
+                    selected_button_index = (selected_button_index - 1) % len(buttons)
+                elif keys[pygame.K_DOWN]:
+                    screen.fill('black')
+                    selected_button_index = (selected_button_index + 1) % len(buttons)
+            
+            pygame.display.flip()
+
+
+    def main_screen(self):
+        global bombs, boost, player_score
+        pygame.display.set_caption("JETPACK JIMMY - Supernova Run")
+        player = Player(280,300, jetpack_l_80px)
+        bomb = Collectible(300,-300, bomb1_img, bomb2_img, bomb3_img, bomb4_img, bomb5_img)
+        bomb1 = Collectible(300,-300, bomb1_img, bomb2_img, bomb3_img, bomb4_img, bomb5_img)
+        bomb2 = Collectible(300,-300, bomb1_img, bomb2_img, bomb3_img, bomb4_img, bomb5_img)
+        bomb3 = Collectible(300,-300, bomb1_img, bomb2_img, bomb3_img, bomb4_img, bomb5_img)
+        bomb4 = Collectible(300,-300, bomb1_img, bomb2_img, bomb3_img, bomb4_img, bomb5_img)
+        bomb5 = Collectible(300,-300, bomb1_img, bomb2_img, bomb3_img, bomb4_img, bomb5_img)
+        firewall = AnimObject(0,600, firewall1_img,firewall2_img,firewall1_img,firewall2_img)
+        player_group.add(player)
+        collectibles_group.add(bomb)
+        misc_group.add(firewall)
+
+        def text(self):
+            self.font = pygame.font.SysFont('haettenschweiler', 50)
+            self.player_score_text = self.font.render(str(player_score), True, ('white'))
+            screen.blit(self.player_score_text, (50,5))
+            self.bombs_text = self.font.render(str(bombs), True, ('white'))
+            screen.blit(self.bombs_text, (496,5))
+
+        main_running = True
+        while main_running:
+            clock.tick(60)
+            screen.fill('black')
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    main_running = False
+                    quit()
+
+            if pygame.sprite.groupcollide(player_group, collectibles_group, False, True):
+                collectibles_group.remove(bomb)
+                bombs += 1
+
+            if len(debris_group) <= 0:
+                for i in range(20):
+                    x = random.randint(0, 600)
+                    y = random.randint(-1200, 0)
+                    debris_obj = Debris(x, y, asteroid_img)
+                    debris_group.add(debris_obj)
+            if len(debris_group) <= 10:
+                for i in range(20):
+                    x = random.randint(0, 600)
+                    y = random.randint(-1200, 0)
+                    debris_obj = Debris(x, y, asteroid_img)
+                    debris_group.add(debris_obj)
+    
+            if len(star_group) <= 0:
+                for i in range(20):
+                    x = random.randint(0,600)
+                    y = random.randint(-1200,0)
+                    star = Star(x, y)
+                    star_group.add(star)
+            if len(star_group) <= 10:
+                for i in range(20):
+                    x = random.randint(0,600)
+                    y = random.randint(-1200,0)
+                    star = Star(x, y)
+                    star_group.add(star)
+
+            if player_score == 50:
+                collectibles_group.add(bomb1)
+            if player_score == 100:
+                collectibles_group.add(bomb2)
+            if player_score == 200:
+                collectibles_group.add(bomb3)
+            if player_score == 500:
+                collectibles_group.add(bomb4)
+            if player_score == 700:
+                collectibles_group.add(bomb5)
+            
+            if player_score >= 1000:
+                main_running = False
+                bombs = 0
+                star_group.empty()
+                debris_group.empty()
+                player_group.empty()
+                misc_group.empty()
+                collectibles_group.empty()
+                self.change_state('win_screen')
+
+            if player.rect.top > 675:
+                main_running = False
+                bombs = 0
+                star_group.empty()
+                debris_group.empty()
+                player_group.empty()
+                misc_group.empty()
+                collectibles_group.empty()
+                self.change_state('exit_screen')
+
+            debris_group.update()
+            collectibles_group.update()
+            player_group.update()
+            star_group.update()
+            misc_group.update()
+
+            star_group.draw(screen)
+            debris_group.draw(screen)
+            collectibles_group.draw(screen)
+            player_group.draw(screen)
+            misc_group.draw(screen)
+
+            screen.blit(blast_img,(475,5))
+            text(self)
+            pygame.display.update()
+            
+
+    def exit_screen(self):
+        global player_score
+        pygame.display.set_caption("Thanks for Playing JETPACK JIMMY")
+        screen.fill('red')
+        screen.blit(jimmythanks,(0,0))
+        pygame.display.update()
+        pygame.time.delay(1000)
+
+        def text(self):
+            self.font = pygame.font.SysFont('haettenschweiler', 50)
+            self.player_score_text = self.font.render(str(player_score), True, ('black'))
+            screen.blit(self.player_score_text, (280,280))
+
+        exit_running = True
+        while exit_running:
+            keys = pygame.key.get_pressed()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    quit()
+                if keys[pygame.K_q]:
+                    exit_running = False
+                    quit()
+                if keys[pygame.K_SPACE]:
+                    player_score = 0
+                    exit_running = False
+                    self.change_state('intro_screen')
+            text(self)
+            pygame.display.update()
+            clock.tick(60)
+    
+    def win_screen(self):
+        global player_score
+        pygame.display.set_caption("YOU ESCAPED THE SUPERNOVA!!!")
+        screen.blit(winscreen_img1,(0,0))
+        pygame.display.update()
+        pygame.time.delay(100)
+        screen.blit(winscreen_img2,(0,0))
+        pygame.display.update()
+        pygame.time.delay(100)
+        screen.blit(winscreen_img3,(0,0))
+        pygame.display.update()
+        pygame.time.delay(100)
+        screen.blit(winscreen_img4,(0,0))
+        pygame.display.update()
+        pygame.time.delay(100)
+        screen.blit(winscreen_img5,(0,0))
+        pygame.display.update()
+        pygame.time.delay(80)
+        screen.blit(winscreen_img6,(0,0))
+        pygame.display.update()
+        pygame.time.delay(100)
+        screen.blit(winscreen_img7,(0,0))
+        pygame.display.update()
+        pygame.time.delay(100)
+        screen.blit(winscreen_img8,(0,0))
+        pygame.display.update()
+        pygame.time.delay(100)
+        screen.blit(winscreen_img9,(0,0))
+        pygame.display.update()
+        pygame.time.delay(750)
+        screen.blit(winscreen_img10,(0,0))
+        pygame.display.update()
+
+        win_running = True
+        while win_running:
+            keys = pygame.key.get_pressed()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    quit()
+                if keys[pygame.K_q]:
+                    win_running = False
+                    quit()
+                if keys[pygame.K_SPACE]:
+                    player_score = 0
+                    win_running = False
+                    self.change_state('intro_screen')
+
+
+game_state = GameState()
+run = True
+while run:
+    game_state.state_manager()
+
+quit()
