@@ -4,7 +4,7 @@
 - 💞️ I’m looking to collaborate on Games and Web3
 - 📫 How to reach me. Write a letter to Boswase Farm, Nancledra, Cornwall. Or post me some seeds
 - 😄 Pronouns: I'm a man, in a man's body. 
-- ⚡ Fun fact: I dislike people with adgendas and hidden motives
+- ⚡ Fun fact: I dislike people with agendas and hidden motives
 
 <!---
 Swillycoder/Swillycoder is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
