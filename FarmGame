@@ -1,0 +1,204 @@
+import pygame, random
+
+pygame.init()
+screen = pygame.display.set_mode((800, 600))
+clock = pygame.time.Clock()
+pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
+pygame.display.set_caption("FARMGAME - Farmyard")
+TILE_SIZE = 36
+
+sunflower_img = pygame.image.load('test/farm/sunflower_art.png').convert_alpha()
+grass_img = pygame.image.load('test/farm/grass.png').convert_alpha()
+plot_empty_img = pygame.image.load('test/farm/plot_empty.png').convert_alpha()
+plot_germinate_img = pygame.image.load('test/farm/plot_germinate.png').convert_alpha()
+plot_germinate2_img = pygame.image.load('test/farm/plot_germinate2.png').convert_alpha()
+plot_foliage1_img = pygame.image.load('test/farm/plot_foliage1.png').convert_alpha()
+plot_foliage2_img = pygame.image.load('test/farm/plot_foliage2.png').convert_alpha()
+plot_potato_img = pygame.image.load('test/farm/plot_potato.png').convert_alpha()
+plot_pumpkin_img = pygame.image.load('test/farm/plot_pumpkin.png').convert_alpha()
+plot_marrow_img = pygame.image.load('test/farm/plot_marrow.png').convert_alpha()
+
+landscape_group = pygame.sprite.Group()
+toolbar_group = pygame.sprite.Group()
+crop_group = pygame.sprite.Group()
+misc_group = pygame.sprite.Group()
+
+class Crops(pygame.sprite.Sprite):
+    def __init__(self, x, y, image1, image2, image3, image4, sprite_delay):
+        super().__init__()
+        self.sprites = [image1,image2,image3, image4]
+        self.current_sprite = 0
+        self.image = self.sprites[int(self.current_sprite)]
+        self.rect = self.image.get_rect(topleft=(x * TILE_SIZE, y * TILE_SIZE))
+        self.timer_event = pygame.USEREVENT + 1
+        self.timer_interval = 1000
+        self.sprite_delay = sprite_delay
+        pygame.time.set_timer(self.timer_event , self.timer_interval)
+
+    def timer(self):
+        self.image = self.sprites[int(self.current_sprite)]
+        if self.timer_interval:
+            self.current_sprite += self.sprite_delay
+        if self.current_sprite >= 4:
+            self.current_sprite = 4
+            self.current_sprite -= 1
+        
+    def update(self):
+        clock.tick(60)
+        self.image = self.sprites[int(self.current_sprite)]
+        self.timer()
+    
+    def draw(self, screen):
+        screen.blit(self.sprites, self.rect)
+
+class Landscape(pygame.sprite.Sprite):
+    def __init__(self, x, y, image):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect(topleft=(x * TILE_SIZE, y * TILE_SIZE))
+
+class Clickable(pygame.sprite.Sprite):
+    def __init__(self, x, y, image):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect(topleft = (x,y))
+    def draw(self, screen):
+        screen.blit(self.image, (self.rect))
+
+class Sunflower(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = sunflower_img
+        self.rect = self.image.get_rect(center = (x,y))
+        self.y = y
+        self.x = x
+    def update(self):
+        self.off_screen()
+        self.y += 5
+        self.rect.center = (self.x, self.y)
+    def draw(self):
+        screen.blit(self.image, self.rect)
+    def off_screen(self):
+         if self.rect.bottom >= 600:
+              misc_group.remove(self)
+
+class GameState():
+    def __init__(self):
+        self.state = 'intro_screen'
+
+    def state_manager(self):
+        if self.state == 'intro_screen':
+            self.intro_screen()
+        if self.state == 'main_screen':
+            self.main_screen()
+        if self.state == 'end_screen':
+            self.end_screen()
+    def change_state(self, new_state):
+        self.state = new_state
+
+    def intro_screen(self):
+        font = pygame.font.SysFont('forte', 100)
+        font_2 = pygame.font.SysFont('forte', 50)
+
+        intro_running = True
+        while intro_running:
+            screen.fill('steelblue3')
+            clock.tick(60)
+
+            if len(misc_group) == 0:
+                for i in range(20):
+                    x = random.randint(0,800)
+                    y = random.randint(-400,0)
+                    sunflower = Sunflower(x, y)
+                    misc_group.add(sunflower)
+            if len(misc_group) <= 10:
+                for i in range(20):
+                    x = random.randint(0,800)
+                    y = random.randint(-1200,0)
+                    sunflower = Sunflower(x, y)
+                    misc_group.add(sunflower)
+                    
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    intro_running = False
+                    quit()
+               
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_SPACE]:
+                    misc_group.empty()
+                    intro_running = False
+                    self.change_state('main_screen')        
+
+            misc_group.update()
+            misc_group.draw(screen)
+            
+            intro_text_1 = font.render('FARM', True, 'white')
+            intro_text_2 = font.render('GAME', True, 'yellow')
+            intro_text_3 = font_2.render('Hit Spacebar', True, 'red')
+            intro_text_1_rect = intro_text_1.get_rect(center =(400,200))
+            intro_text_2_rect = intro_text_2.get_rect(center =(400,300))
+            intro_text_3_rect = intro_text_3.get_rect(center =(400,400))
+            screen.blit(intro_text_1, intro_text_1_rect)
+            screen.blit(intro_text_2, intro_text_2_rect)
+            screen.blit(intro_text_3, (intro_text_3_rect.x, intro_text_3_rect.y + 100))
+
+            pygame.display.update()
+
+
+
+    def main_screen(self):
+        pygame.display.set_caption("FARMLAND - Your Farm")
+        screen.fill('steelblue3')
+
+
+        tilemap1 = [
+    'GGGGGGGGGGGGGGGGGG',
+    'GGGPPPGPPPGPPPGGGG',
+    'GGGPGGGPGPGGPGGGGG',
+    'GGGPPPGPPPGGPGGGGG',
+    'GGGPGGGPGPGGPGGGGG',
+    'GGGPPPGPGPGGPGGGGG',
+    'GGGGGGGGGGGGGGGGGG',
+    'GGGMGGGMGMMMGMMMGG',
+    'GGGMGGGMGMGGGMGGGG',
+    'GGGGMGMGGMMMGMMMGG',
+    'GGGGMGMGGMGGGMGMGG',
+    'GGGGGMGGGMMMGMMMGG',
+    'GGGGGGGGGGGGGGGGGG',
+]
+        for row_index, row in enumerate(tilemap1):
+            for col_index, tile in enumerate(row):
+                if tile == 'G':
+                    landscape_group.add(Landscape(col_index, row_index, grass_img))
+                elif tile == 'T':
+                    crop_group.add(Crops(col_index, row_index,plot_empty_img,plot_germinate2_img, plot_foliage1_img, plot_potato_img, 0.1))
+                elif tile == 'P':
+                    crop_group.add(Crops(col_index, row_index,plot_empty_img, plot_germinate_img, plot_foliage2_img, plot_pumpkin_img, 0.2))
+                elif tile == 'M':
+                    crop_group.add(Crops(col_index, row_index,plot_empty_img, plot_germinate_img, plot_foliage2_img, plot_marrow_img, 0.15))
+
+        main_running = True
+        while main_running:
+            clock.tick(60)
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_button = pygame.mouse.get_pressed()
+   
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    quit()
+
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    pass
+
+            landscape_group.update()
+            crop_group.update()
+            landscape_group.draw(screen)
+            crop_group.draw(screen)
+            pygame.display.update()
+
+game_state = GameState()
+run = True
+while run:
+    game_state.state_manager()
+
+quit()
