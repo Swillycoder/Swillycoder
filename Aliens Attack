@@ -1,0 +1,433 @@
+import pygame
+import random
+pygame.init()
+screen = pygame.display.set_mode((600,600))
+pygame.display.set_caption('Aliens Attack')
+clock = pygame.time.Clock()
+
+#space_bar_img = pygame.image.load('health_bar.png').convert_alpha()
+bullet_img = pygame.Surface([5,20]).convert_alpha()
+ufo_img = pygame.image.load('ufo.png').convert_alpha()
+player_ship_img = pygame.image.load('spacebar_ship.png').convert_alpha()
+star_img = pygame.Surface([2,2]).convert_alpha()
+
+
+reload_time = 250
+health = 96
+score = 0
+
+bullet_group = pygame.sprite.Group()
+enemy_group = pygame.sprite.Group()
+star_group = pygame.sprite.Group()
+shotdown_group = pygame.sprite.Group()
+
+class SpaceBar(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = player_ship_img
+        self.rect = self.image.get_rect(topleft = (x,y))
+        self.timer_colours = pygame.USEREVENT + 3
+        self.timer_interval3 = 200
+        pygame.time.set_timer(self.timer_colours , self.timer_interval3)
+        self.colours = ['blue', 'steelblue2', 'steelblue3','white', 'steelblue3']
+        self.value = 0
+        self.x = x
+        self.y = y
+
+
+    def colours_timer(self):
+        self.space_bar_surface = pygame.Surface([health, 12])
+        self.bar_colour = self.colours[self.value]  
+        self.space_bar_surface.fill(self.bar_colour)
+        if self.value >= len(self.colours):
+            self.value = 0
+
+    def update(self):
+        self.colours_timer()
+        self.keys()
+
+    def keys(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            if self.rect.x > 0:
+                self.rect.x -= 10
+        if keys[pygame.K_RIGHT]:
+            if self.rect.x < 600 - self.rect.width:
+                self.rect.x += 10
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+        screen.blit(self.space_bar_surface, (self.rect.x +7, self.rect.y + 19))
+
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = bullet_img
+        self.rect = self.image.get_rect(topleft = (x,y))
+        self.image.fill('yellow')
+        self.x = x
+        self.y = y
+    def update(self):
+        self.rect.y -= 10
+        if self.rect.top <= 100:
+            self.remove(bullet_group)
+
+    def draw(self):
+        screen.blit(self.image, self.rect.topleft)
+
+class Ufo(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = ufo_img
+        self.rect = self.image.get_rect(center = (x,y))
+        self.timer_colour_event = pygame.USEREVENT + 4
+        self.timer_interval = 200
+        pygame.time.set_timer(self.timer_colour_event , self.timer_interval)
+        self.x = x
+        self.y = y
+
+    def colours_timer(self):
+        self.value = random.randrange(0,4)
+        self.colours = ['yellow', 'orange', 'red', 'white', 'red']
+        self.ufo_colour_surface = pygame.Surface([30, 30])
+        self.colour_choice = self.colours[self.value]  
+        self.ufo_colour_surface.fill(self.colour_choice)
+        screen.blit(self.ufo_colour_surface, (self.rect.x + 12, self.rect.y + 10))
+
+    def update(self):
+        global health
+        self.colours_timer()
+        self.rect.y += 3
+        if self.rect.bottom >= 600:
+            enemy_group.remove(self)
+            health -= 5 
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
+class Star(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface([3,3])
+        self.rect = self.image.get_rect(center = (x,y))
+        self.image.fill('white')
+        self.y = y
+        self.x = x
+    def update(self):
+        self.off_screen()
+        self.y += 10
+        self.rect.center = (self.x, self.y)
+    def draw(self):
+        screen.blit(self.image, self.rect)
+    def off_screen(self):
+         if self.rect.bottom >= 600:
+              star_group.remove(self)
+
+class GameState():
+    def __init__(self):
+        self.state = 'intro'
+
+    def state_manager(self):
+        if self.state == 'intro':
+            self.intro()
+        if self.state == 'main_screen':
+            self.main_screen()
+        if self.state == 'exit_screen':
+            self.exit_screen()
+        if self.state == 'winner_screen':
+            self.winner_screen()
+
+    def change_state(self, new_state):
+        self.state = new_state
+
+    def intro(self):
+        global health
+        font = pygame.font.SysFont('IMPACT', 100)
+        font_2 = pygame.font.SysFont('IMPACT', 50)
+
+        intro_running = True
+        while intro_running:
+            screen.fill('black')
+            clock.tick(60)
+            
+
+            if len(star_group) == 0:
+                for i in range(20):
+                    x = random.randint(0,600)
+                    y = random.randint(-400,0)
+                    star = Star(x, y)
+                    star_group.add(star)
+            if len(star_group) <= 10:
+                for i in range(20):
+                    x = random.randint(0,600)
+                    y = random.randint(-1200,0)
+                    star = Star(x, y)
+                    star_group.add(star)
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    intro_running = False
+                    quit()
+               
+               
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_SPACE]:
+                    health = 96
+                    intro_running = False
+                    self.change_state('main_screen')        
+
+            star_group.update()
+            star_group.draw(screen)
+            
+            intro_text_1 = font.render('ALIENS', True, 'white')
+            intro_text_2 = font.render('ATTACK', True, 'yellow')
+            intro_text_3 = font_2.render('Hit Spacebar', True, 'red')
+            intro_text_1_rect = intro_text_1.get_rect(center =(300,200))
+            intro_text_2_rect = intro_text_2.get_rect(center =(300,300))
+            intro_text_3_rect = intro_text_3.get_rect(center =(300,400))
+            screen.blit(intro_text_1, intro_text_1_rect)
+            screen.blit(intro_text_2, intro_text_2_rect)
+            screen.blit(intro_text_3, (intro_text_3_rect.x, intro_text_3_rect.y + 100))
+
+            pygame.display.update()
+
+    def main_screen(self):
+        global health, score
+        master_time = 60
+        bullet_counter = 1
+        enemies = 20
+        
+        font = pygame.font.SysFont('forte', 50)
+        timer_interval = 1000
+        timer_reload = 200
+        timer_enemies = 5000
+        timer_event = pygame.USEREVENT + 1
+        timer_reload_event = pygame.USEREVENT + 2
+        add_enemies_event = pygame.USEREVENT + 3
+        pygame.time.set_timer(timer_event , timer_interval)
+        pygame.time.set_timer(timer_reload_event , timer_reload)
+        pygame.time.set_timer(add_enemies_event , timer_enemies)
+
+        space_bar = SpaceBar(250, 550)
+
+        main_running = True
+
+        while main_running:
+            screen.fill('black')
+            clock.tick(60)
+            keys = pygame.key.get_pressed()
+            
+            if len(star_group) == 0:
+                for i in range(20):
+                    x = random.randint(0,600)
+                    y = random.randint(-400,0)
+                    star = Star(x, y)
+                    star_group.add(star)
+            if len(star_group) <= 10:
+                for i in range(20):
+                    x = random.randint(0,600)
+                    y = random.randint(-1200,0)
+                    star = Star(x, y)
+                    star_group.add(star)
+
+            if len(enemy_group) == 0:
+                for i in range(enemies):
+                    x = random.randint(0, 600 - 50)
+                    y = random.randint(-600, -50)
+                    ufo = Ufo(x, y)
+                    enemy_group.add(ufo)
+
+            shotdown_sprites = pygame.sprite.groupcollide(bullet_group, enemy_group, True, True)
+            if shotdown_sprites:
+                score += len(shotdown_sprites)
+                for sprite in shotdown_sprites:
+                    if bullet.rect == sprite.rect:
+                        enemy_group.remove(ufo)
+                        bullet_group.remove(bullet)
+
+            if health == 1:
+                health = 1
+                main_running = False
+                self.change_state('exit_screen')
+
+            if master_time == 0:
+                main_running = False
+                self.change_state('winner_screen')
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    main_running = False
+                    quit()
+
+                elif event.type == timer_event:
+                    master_time -= 1
+
+                elif event.type == space_bar.timer_colours:
+                    space_bar.value += 1
+                    if space_bar.value == len(space_bar.colours):
+                        space_bar.value = 0
+
+                elif event.type == timer_reload_event:
+                    bullet_counter += 1
+                    if bullet_counter >= 1:
+                        if keys[pygame.K_SPACE]:
+                            bullet = Bullet(space_bar.rect.right - 20, 550)
+                            bullet_2 = Bullet(space_bar.rect.left + 20, 550)
+                            bullet_group.add(bullet, bullet_2)
+                            bullet_counter = 0
+
+                elif event.type == add_enemies_event:
+                    enemies += 15
+
+
+            clock_text = font.render(str(master_time), True, ('white'))
+            clock_text_rect = clock_text.get_rect(topleft =(280,10))
+            screen.blit(clock_text, clock_text_rect)
+
+            score_text = font.render(str(score), True, ('white'))
+            score_text_rect = score_text.get_rect(topleft =(10,10))
+            screen.blit(score_text, score_text_rect)
+
+            space_bar.update()
+            space_bar.draw(screen)
+            bullet_group.update()
+            bullet_group.draw(screen)
+            enemy_group.update()
+            enemy_group.draw(screen)
+            star_group.update()
+            star_group.draw(screen)
+
+            pygame.display.update()
+
+    def exit_screen(self):
+        global score
+        font = pygame.font.SysFont('IMPACT', 100)
+        font_2 = pygame.font.SysFont('IMPACT', 50)
+
+        intro_running = True
+        while intro_running:
+            screen.fill('black')
+            clock.tick(60)
+            
+
+            if len(star_group) == 0:
+                for i in range(20):
+                    x = random.randint(0,600)
+                    y = random.randint(-400,0)
+                    star = Star(x, y)
+                    star_group.add(star)
+            if len(star_group) <= 10:
+                for i in range(20):
+                    x = random.randint(0,600)
+                    y = random.randint(-1200,0)
+                    star = Star(x, y)
+                    star_group.add(star)
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    intro_running = False
+                    quit()
+               
+               
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_p]:
+                    score = 0
+                    enemy_group.empty()
+                    intro_running = False
+                    self.change_state('intro')
+
+                if keys[pygame.K_q]:
+                    intro_running = False
+                    quit()  
+
+            star_group.update()
+            star_group.draw(screen)
+            
+            intro_text_1 = font.render('YOU', True, 'red')
+            intro_text_2 = font.render('DIED', True, 'red')
+            intro_text_3 = font_2.render('Hit P to play again', True, 'white')
+            intro_text_4 = font_2.render('Hit Q to Quit', True, 'white')
+            intro_text_1_rect = intro_text_1.get_rect(center =(300,200))
+            intro_text_2_rect = intro_text_2.get_rect(center =(300,300))
+            intro_text_3_rect = intro_text_3.get_rect(center =(300,400))
+            intro_text_4_rect = intro_text_4.get_rect(center =(300,450))
+            screen.blit(intro_text_1, intro_text_1_rect)
+            screen.blit(intro_text_2, intro_text_2_rect)
+            screen.blit(intro_text_3, (intro_text_3_rect))
+            screen.blit(intro_text_4, (intro_text_4_rect))
+
+
+            pygame.display.update()
+
+    def winner_screen(self):
+        global score
+        font = pygame.font.SysFont('IMPACT', 80)
+        font_2 = pygame.font.SysFont('IMPACT', 50)
+
+        intro_running = True
+        while intro_running:
+            screen.fill('black')
+            clock.tick(60)
+            
+            if len(star_group) == 0:
+                for i in range(20):
+                    x = random.randint(0,600)
+                    y = random.randint(-400,0)
+                    star = Star(x, y)
+                    star_group.add(star)
+            if len(star_group) <= 10:
+                for i in range(20):
+                    x = random.randint(0,600)
+                    y = random.randint(-1200,0)
+                    star = Star(x, y)
+                    star_group.add(star)
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    intro_running = False
+                    quit()
+               
+               
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_p]:
+                    enemy_group.empty()
+                    score = 0
+                    intro_running = False
+                    self.change_state('intro')
+
+                if keys[pygame.K_q]:
+                    intro_running = False
+                    quit()  
+
+            star_group.update()
+            star_group.draw(screen)
+            
+            intro_text_1 = font.render('YOU', True, 'green')
+            intro_text_2 = font.render('SURVIVED', True, 'green')
+            intro_text_3 = font_2.render('ALIENS ELIMINATED', True, 'red')
+            intro_text_4 = font.render(str(score), True, 'red')
+            intro_text_5 = font_2.render('Hit P to play again', True, 'white')
+            intro_text_6 = font_2.render('Hit Q to Quit', True, 'white')
+            intro_text_1_rect = intro_text_1.get_rect(center =(100,50))
+            intro_text_2_rect = intro_text_1.get_rect(center =(100,130))
+            intro_text_3_rect = intro_text_1.get_rect(center =(100,250))
+            intro_text_4_rect = intro_text_1.get_rect(center =(100,300))
+            intro_text_5_rect = intro_text_1.get_rect(center =(100,450))
+            intro_text_6_rect = intro_text_1.get_rect(center =(100,500))
+            screen.blit(intro_text_1, intro_text_1_rect)
+            screen.blit(intro_text_2, (intro_text_2_rect))
+            screen.blit(intro_text_3, (intro_text_3_rect))
+            screen.blit(intro_text_4, (intro_text_4_rect))
+            screen.blit(intro_text_5, (intro_text_5_rect))
+            screen.blit(intro_text_6, (intro_text_6_rect))
+
+
+            pygame.display.update()
+
+game_state = GameState()
+
+run = True
+while run:
+    game_state.state_manager()
+
+pygame.quit()
