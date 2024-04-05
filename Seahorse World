@@ -1,0 +1,206 @@
+import pygame
+#import sys
+import random
+from pygame.math import Vector2
+
+WIDTH = 800
+HEIGHT = 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("TRASHBUSTER")
+pygame.init()
+clock = pygame.time.Clock()
+pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
+background = pygame.image.load('trashbusterbg2.png').convert_alpha()
+seahorse = pygame.image.load('seahorse_smlTP2.png').convert_alpha()
+crispbag = pygame.image.load('crispbag_sml.png').convert_alpha()
+exit_bg = pygame.image.load('exit_screen_L2.png').convert_alpha()
+bottle = pygame.image.load('bottle_sml.png').convert_alpha()
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = seahorse
+        self.rect = self.image.get_rect(center=(x, y))
+        self.position = Vector2(x, y)
+        self.velocity = Vector2(0, 0)
+    def draw(self):
+        screen.blit(self.image, self.rect)
+
+    def move_to(self, target):
+        direction = target - self.position
+        distance_to_target = direction.length()
+
+        if distance_to_target != 0:
+            direction.normalize_ip()
+
+        speed = 2.5
+        if distance_to_target < speed:
+            self.position = target
+        else:
+            self.velocity = direction * speed
+            self.position += self.velocity
+
+        self.rect.center = self.position
+
+class Crispbag(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = crispbag
+        self.rect = self.image.get_rect(topleft=(x,y))
+        self.x = x
+        self.y = y
+    
+    def update(self):
+        self.y += 1.4
+        self.rect.topleft = (self.x, self.y)
+        self.off_screen()
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
+    def off_screen(self):
+        if self.rect.bottom >= 500:
+            crispbag_group.remove(self)
+
+class Bottle(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = bottle
+        self.rect = self.image.get_rect(topleft=(x,y))
+        self.x = x
+        self.y = y
+    
+    def update(self):
+        self.x += 2
+        self.rect.topleft = (self.x, self.y)
+        self.off_screen()
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
+    def off_screen(self):
+        if self.rect.right >= 800:
+            bottle_group.remove(self)
+
+def update_score_text():
+    global score_text
+    global bottle_score_text
+    score_text = font.render(str(score), True, ('yellow'))
+    bottle_score_text = font.render(str(bottle_score), True, ('yellow'))
+    
+
+def exit_screen():
+    global run
+    
+    screen.fill((100,100,100))
+    screen.blit(exit_bg, (0,0))
+    score_text_rect = score_text.get_rect(center = (288, 270))
+    screen.blit(score_text, score_text_rect)
+    bottle_score_text_rect = bottle_score_text.get_rect(center = (564, 270))
+    screen.blit(bottle_score_text, bottle_score_text_rect)
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                quit()
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                run = False
+                quit()
+        pygame.display.update()
+        pygame.time.delay(3000)
+
+crispbag_group = pygame.sprite.Group()
+bottle_group = pygame.sprite.Group()
+
+for i in range(10):
+                x = random.randint(0, WIDTH - crispbag.get_width())
+                y = random.randint(-1200, (-800 + HEIGHT - crispbag.get_height()))
+                crispbag_obj = Crispbag(x, y)
+                crispbag_group.add(crispbag_obj)
+
+for i in range(5):
+                x_range = (-800, 0)
+                y_range = (0, 425)
+                x = random.randint(x_range[0], x_range[1])
+                y = random.randint(y_range[0], y_range[1])
+                bottle_obj = Bottle(x, y)
+                bottle_group.add(bottle_obj)
+
+player = Player(400, 200)
+target = None
+
+bottle_score = 0
+score = 0
+counter = 40
+font = pygame.font.SysFont('forte', 50)
+text = font.render(str(counter), True, ('red'))
+score_font = font.render(str(score), True, ('red'))
+timer_interval = 1000
+timer_event = pygame.USEREVENT + 1
+pygame.time.set_timer(timer_event , timer_interval)
+run = True
+while run:
+    clock.tick(60)
+    screen.blit(background, (0,0))
+    crispbag_group.update()
+    crispbag_group.draw(screen)
+    bottle_group.update()
+    bottle_group.draw(screen)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            quit()
+
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            target = Vector2(*event.pos)
+
+        elif event.type == timer_event:
+            counter -= 1
+            text = font.render(str(counter), True, ('red'))
+            if counter == 0:
+                exit_screen()
+
+    collisions_sprites = pygame.sprite.spritecollide(player, crispbag_group, True)
+    score += len(collisions_sprites)
+    if collisions_sprites:
+        for sprite in collisions_sprites:
+            if player.rect == sprite.rect:
+                crispbag_group.remove(crispbag_obj)        
+    if len(crispbag_group) == 0:
+         for i in range(20):
+                x = random.randint(0, WIDTH - crispbag.get_width())
+                y = random.randint(-1200, (-800 + HEIGHT - crispbag.get_height()))
+                crispbag_obj = Crispbag(x, y)
+                crispbag_group.add(crispbag_obj)
+
+    bottle_sprites = pygame.sprite.spritecollide(player, bottle_group, True)
+    bottle_score += len(bottle_sprites)
+    if bottle_sprites:
+        for sprite in bottle_sprites:
+            if player.rect == sprite.rect:
+                bottle_group.remove(bottle_obj)
+    if len(bottle_group) == 0:
+         for i in range(5):
+                x_range = (-800, 0)
+                y_range = (0, 425)
+                x = random.randint(x_range[0], x_range[1])
+                y = random.randint(y_range[0], y_range[1])
+                bottle_obj = Bottle(x, y)
+                bottle_group.add(bottle_obj)
+
+    if target:
+            player.move_to(target)
+    player.draw()
+
+    update_score_text()
+    text_rect = text.get_rect(center = (222, 538))
+    score_text_rect = score_font.get_rect(center = (685, 568))
+    bottle_score_text_rect = bottle_score_text.get_rect(center = (685, 520))
+    screen.blit(text, text_rect)
+    screen.blit(score_text, score_text_rect)
+    screen.blit(bottle_score_text, bottle_score_text_rect)
+
+    pygame.display.update()
+
+pygame.quit()
