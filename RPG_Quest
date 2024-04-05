@@ -1,0 +1,2082 @@
+import pygame
+import sys
+import random
+
+pygame.init()
+screen = pygame.display.set_mode((800, 600))
+clock = pygame.time.Clock()
+pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
+TILE_SIZE = 32
+
+# Load player image and player buttons
+player_image = pygame.image.load('test/dungeon_rpg/warrior.png').convert_alpha()
+up_img = pygame.image.load('up.png').convert_alpha()
+down_img = pygame.image.load('down.png').convert_alpha()
+left_img = pygame.image.load('left.png').convert_alpha()
+right_img = pygame.image.load('right.png').convert_alpha()
+search_img = pygame.image.load('search_button.png').convert_alpha()
+#Backgrounds & Micellaneous
+intro_bg = pygame.image.load('test/dungeon_rpg/homestead.png').convert_alpha()
+bg_image = pygame.image.load('test/dungeon_rpg/rpg_bg.png').convert_alpha()
+exit_bg = pygame.image.load('bio_punk_exit.png').convert_alpha()
+village_bg = pygame.image.load('test/dungeon_rpg/village_bg.png').convert_alpha()
+encounter_bg = pygame.image.load('encounter.png').convert_alpha()
+forge_bg = pygame.image.load('test/dungeon_rpg/forge_bg.png').convert_alpha()
+smelter_bg = pygame.image.load('smelter_bg2.png').convert_alpha()
+inventory_bg = pygame.image.load('test/dungeon_rpg/inventory_bg.png').convert_alpha()
+firepit_bg = pygame.image.load('test/dungeon_rpg/firepit_bg.png').convert_alpha()
+firepit_img = pygame.image.load('test/dungeon_rpg/firepit.png').convert_alpha()
+exchange_img = pygame.image.load('village_exchange.png').convert_alpha()
+exchange_sidebar = pygame.image.load('test/dungeon_rpg/exchange_bar.png').convert_alpha()
+exchange_button_img = pygame.image.load('exchange_button.png').convert_alpha()
+craft_button_img = pygame.image.load('test/dungeon_rpg/craft_button.png').convert_alpha()
+craft_button2_img = pygame.image.load('test/dungeon_rpg/craft_hammers.png').convert_alpha()
+weapon_screen_bg = pygame.image.load('test/dungeon_rpg/weapon_craft.png').convert_alpha()
+weapon_craft_bg = pygame.image.load('test/dungeon_rpg/weapon_craft_bg.png').convert_alpha()
+main_banner_txt = pygame.image.load('test/dungeon_rpg/main_banner_txt.png').convert_alpha()
+plus_img = pygame.image.load('plus25px.png').convert_alpha()
+minus_img = pygame.image.load('minus25px.png').convert_alpha()
+craft_click_img = pygame.image.load('test/dungeon_rpg/click_craft.png').convert_alpha()
+village_msg = pygame.image.load('village_msg.png').convert_alpha()
+exit_image = pygame.image.load('exit_32px.png').convert_alpha()
+exit_img2 = pygame.image.load('test/dungeon_rpg/exit_80px.png').convert_alpha()
+attack_msg = pygame.image.load('test/dungeon_rpg/attack_msg.png').convert_alpha()
+search_button_img = pygame.image.load('test/dungeon_rpg/search_button.png').convert_alpha()
+attack_button_img = pygame.image.load('test/dungeon_rpg/attack_button.png').convert_alpha()
+search_banner = pygame.image.load('test/dungeon_rpg/click_search.png').convert_alpha()
+enter_forge_banner = pygame.image.load('test/dungeon_rpg/click_forge.png').convert_alpha()
+enter_smelter_banner = pygame.image.load('test/dungeon_rpg/click_smelter.png').convert_alpha()
+enter_exchange_banner = pygame.image.load('test/dungeon_rpg/click_exchange.png').convert_alpha()
+craft_charcoal_banner = pygame.image.load('test/dungeon_rpg/click_firepit.png').convert_alpha()
+health_container_img = pygame.image.load('test/dungeon_rpg/health_container.png').convert_alpha()
+backpack_img = pygame.image.load('test/dungeon_rpg/backpack.png').convert_alpha()
+blood = pygame.image.load('test/dungeon_rpg/blood.png').convert_alpha()
+you_win = pygame.image.load('test/dungeon_rpg/you_win_lrg.png').convert_alpha()
+#Landscape
+wall_image = pygame.image.load('test/dungeon_rpg/wall_32px.png').convert_alpha()
+plains_image = pygame.image.load('test/dungeon_rpg/grass_32px.png').convert_alpha()
+mountains_image = pygame.image.load('test/dungeon_rpg/mountain_32px.png').convert_alpha()
+iron_mountain_image = pygame.image.load('test/dungeon_rpg/ironmountain_32px.png').convert_alpha()
+silver_mountain_image = pygame.image.load('test/dungeon_rpg/silvermountain_32px.png').convert_alpha()
+gold_mountain_image = pygame.image.load('test/dungeon_rpg/goldmountain_32px.png').convert_alpha()
+forest_image = pygame.image.load('test/dungeon_rpg/forest_32px.png').convert_alpha()
+hills_image = pygame.image.load('test/dungeon_rpg/hills_32px.png').convert_alpha()
+firepit_image = pygame.image.load('test/dungeon_rpg/firepit_32px.png').convert_alpha()
+village_image = pygame.image.load('test/dungeon_rpg/tent_32px.png').convert_alpha()
+hut_image = pygame.image.load('test/dungeon_rpg/hut.png').convert_alpha()
+#Weapons
+dagger_img = pygame.image.load('test/dungeon_rpg/dagger.png').convert_alpha()
+sword_img = pygame.image.load('test/dungeon_rpg/sword.png').convert_alpha()
+axe_img = pygame.image.load('test/dungeon_rpg/axe.png').convert_alpha()
+mace_img = pygame.image.load('test/dungeon_rpg/mace.png').convert_alpha()
+club_img = pygame.image.load('test/dungeon_rpg/club.png').convert_alpha()
+spear_img = pygame.image.load('test/dungeon_rpg/spear50px.png').convert_alpha()
+#Silver Weapons
+sdagger_img = pygame.image.load('test/dungeon_rpg/dagger2_50px.png').convert_alpha()
+ssword_img = pygame.image.load('test/dungeon_rpg/sword2_50px.png').convert_alpha()
+saxe_img = pygame.image.load('test/dungeon_rpg/axe2_50px.png').convert_alpha()
+smace_img = pygame.image.load('test/dungeon_rpg/mace2_50px.png').convert_alpha()
+sclub_img = pygame.image.load('test/dungeon_rpg/club2_50px.png').convert_alpha()
+sspear_img = pygame.image.load('test/dungeon_rpg/spear2_50px.png').convert_alpha()
+#Gold Weapons
+gdagger_img = pygame.image.load('test/dungeon_rpg/dagger3_50px.png').convert_alpha()
+gsword_img = pygame.image.load('test/dungeon_rpg/sword3_50px.png').convert_alpha()
+gaxe_img = pygame.image.load('test/dungeon_rpg/axe3_50px.png').convert_alpha()
+gmace_img = pygame.image.load('test/dungeon_rpg/mace3_50px.png').convert_alpha()
+gclub_img = pygame.image.load('test/dungeon_rpg/club3_50px.png').convert_alpha()
+gspear_img = pygame.image.load('test/dungeon_rpg/spear3_50px.png').convert_alpha()
+#Iron Weapon Info
+dagger_info_img = pygame.image.load('test/dungeon_rpg/dagger_info.png').convert_alpha()
+sword_info_img = pygame.image.load('test/dungeon_rpg/sword_info.png').convert_alpha()
+axe_info_img = pygame.image.load('test/dungeon_rpg/axe_info.png').convert_alpha()
+mace_info_img = pygame.image.load('test/dungeon_rpg/mace_info.png').convert_alpha()
+spear_info_img = pygame.image.load('test/dungeon_rpg/spear_info.png').convert_alpha()
+club_info_img = pygame.image.load('test/dungeon_rpg/club_info.png').convert_alpha()
+#Silver Weapon Info
+sdagger_info_img = pygame.image.load('test/dungeon_rpg/sdagger_info.png').convert_alpha()
+ssword_info_img = pygame.image.load('test/dungeon_rpg/ssword_info.png').convert_alpha()
+saxe_info_img = pygame.image.load('test/dungeon_rpg/saxe_info.png').convert_alpha()
+smace_info_img = pygame.image.load('test/dungeon_rpg/smace_info.png').convert_alpha()
+sspear_info_img = pygame.image.load('test/dungeon_rpg/sspear_info.png').convert_alpha()
+sclub_info_img = pygame.image.load('test/dungeon_rpg/sclub_info.png').convert_alpha()
+#Gold Weapon Info
+gdagger_info_img = pygame.image.load('test/dungeon_rpg/gdagger_info.png').convert_alpha()
+gsword_info_img = pygame.image.load('test/dungeon_rpg/gsword_info.png').convert_alpha()
+gaxe_info_img = pygame.image.load('test/dungeon_rpg/gaxe_info.png').convert_alpha()
+gmace_info_img = pygame.image.load('test/dungeon_rpg/gmace_info.png').convert_alpha()
+gspear_info_img = pygame.image.load('test/dungeon_rpg/gspear_info.png').convert_alpha()
+gclub_info_img = pygame.image.load('test/dungeon_rpg/gclub_info.png').convert_alpha()
+
+#Currency
+gold_coin_image = pygame.image.load('gold_coin_sml.png').convert_alpha()
+silver_coin_image = pygame.image.load('silver_coin_sml.png').convert_alpha()
+copper_coin_image = pygame.image.load('copper_coin_sml.png').convert_alpha()
+#Miscellaneos
+
+#Resources
+wood_img = pygame.image.load('wood50px.png').convert_alpha()
+stone_img = pygame.image.load('stone50px.png').convert_alpha()
+iron_img = pygame.image.load('iron50px.png').convert_alpha()
+gold_img = pygame.image.load('gold50px.png').convert_alpha()
+charcoal_img = pygame.image.load('charcoal50px.png').convert_alpha()
+ironbar_img = pygame.image.load('test/dungeon_rpg/iron_bar50px.png').convert_alpha()
+silverbar_img = pygame.image.load('test/dungeon_rpg/silver_bar50px.png').convert_alpha()
+goldbar_img = pygame.image.load('test/dungeon_rpg/gold_bar50px.png').convert_alpha()
+ironbar_img2 = pygame.image.load('test/dungeon_rpg/iron_bar100px.png').convert_alpha()
+silverbar_img2 = pygame.image.load('test/dungeon_rpg/silver_bar100px.png').convert_alpha()
+goldbar_img2 = pygame.image.load('test/dungeon_rpg/gold_bar100px.png').convert_alpha()
+#Groups
+wall_tiles = pygame.sprite.Group()
+landscape_tiles = pygame.sprite.Group()
+forest_group = pygame.sprite.Group()
+hill_group = pygame.sprite.Group()
+iron_mountain_group = pygame.sprite.Group()
+silver_mountain_group = pygame.sprite.Group()
+gold_mountain_group = pygame.sprite.Group()
+exit_tile = pygame.sprite.Group()
+village_tiles = pygame.sprite.Group()
+player_sprite = pygame.sprite.GroupSingle()
+firepit_tile = pygame.sprite.GroupSingle()
+encounter_sprites = pygame.sprite.Group()
+weapons_group = pygame.sprite.Group()
+all_sprites = pygame.sprite.Group()
+player_weapons = pygame.sprite.Group()
+left_hand_weapon = pygame.sprite.GroupSingle()
+right_hand_weapon = pygame.sprite.GroupSingle()
+
+#Starting Health & Resources
+player_health_max = 10
+player_health = 10
+player_wood = 100
+player_stone = 0
+player_charcoal = 10
+player_ironore = 0
+player_silverore = 0
+player_goldore = 0
+player_ironbar = 4
+player_silverbar = 0
+player_goldbar = 0
+#Weapon Amounts
+player_dagger = 0
+player_sword = 0
+player_axe = 0
+player_mace = 0
+player_spear = 0
+player_club = 0
+#Silver weapon amounts
+player_sdagger = 0
+player_ssword = 0
+player_saxe = 0
+player_smace = 0
+player_sspear = 0
+player_sclub = 0
+#Gold weapon amounts
+player_gdagger = 0
+player_gsword = 0
+player_gaxe = 0
+player_gmace = 0
+player_gspear = 0
+player_gclub = 0
+#Player Money
+player_copper = 0
+player_silver = 0
+player_gold = 0
+#Exchange float
+copper_ex_amount = 0
+silver_ex_amount = 0
+item_amount = 0
+#Smelter float
+charcoal_used = 0
+ironore_used = 0
+silverore_used = 0
+goldore_used = 0
+#Enemies
+enemy_health = 2
+
+
+
+#Classes
+class Player(pygame.sprite.Sprite):
+    def __init__(self, x, y, obstacles):
+        super().__init__()
+        self.image = player_image
+        self.rect = self.image.get_rect(topleft=(x * TILE_SIZE, y * TILE_SIZE))
+        self.health = player_health
+        self.attack = 1
+        self.player_gold = player_gold
+        self.old_rect = self.rect.copy()
+        self.resource_font = pygame.font.SysFont('rockwell',40)
+        self.player_wood_main = self.resource_font.render(str(player_wood), True, ('white'))
+        self.x = x
+        self.y = y
+
+        self.image_up = up_img
+        self.up_rect = self.image_up.get_rect(center = (400,445))
+
+        self.image_down = down_img
+        self.down_rect = self.image_down.get_rect(center = (400,509))
+
+        self.image_left = left_img
+        self.left_rect = self.image_left.get_rect(center = (368,477))
+
+        self.image_right = right_img
+        self.right_rect = self.image_right.get_rect(center = (432,477))
+
+        self.image_search = search_img
+        self.search_rect = self.image_search.get_rect(center = (400,565))
+        
+        self.health_container = health_container_img
+        self.health_container_rect = self.health_container.get_rect(topleft = (28,523))
+
+        self.health_bar_img = pygame.Surface([36,(28/player_health_max * player_health)])
+        self.health_bar_img_rect = self.health_bar_img.get_rect(midbottom = (46,555))
+        self.health_bar_img.fill('red')
+
+        self.speed = 32
+        self.prev_mouse_button = [False, False, False]
+        self.obstacles = obstacles
+
+    def collisions(self, direction):
+        collisions_sprites = pygame.sprite.spritecollide(self, wall_tiles, False,)
+        if collisions_sprites:
+            if direction == 'horizontal':
+                for sprite in collisions_sprites:
+                    if self.rect.right >= sprite.rect.left and self.old_rect.right <= sprite.old_rect.left:
+                        self.rect.right = sprite.rect.left
+                        self.x = self.rect.x
+                    if self.rect.left <= sprite.rect.right and self.old_rect.left >= sprite.old_rect.right:
+                        self.rect.left = sprite.rect.right
+                        self.x = self.rect.x
+
+            if direction == 'vertical':
+                for sprite in collisions_sprites:
+                    if self.rect.bottom >= sprite.rect.top and self.old_rect.bottom <= sprite.old_rect.top:
+                        self.rect.bottom = sprite.rect.top
+                        self.y = self.rect.y
+                    if self.rect.top <= sprite.rect.bottom and self.old_rect.top >= sprite.old_rect.bottom:
+                        self.rect.top = sprite.rect.bottom
+                        self.y = self.rect.y
+
+    def boundaries(self):
+        if self.rect.left <= 16:
+            self.rect.left = 16
+        if self.rect.right >= 784:
+            self.rect.right = 784
+        if self.rect.top <= 16:
+            self.rect.top = 16
+        if self.rect.bottom >= 432:
+            self.rect.bottom = 432
+
+    def update(self, mouse_button):
+        self.boundaries()
+        self.old_rect = self.rect.copy()
+
+        for i in range(3):
+            if mouse_button[i] and not self.prev_mouse_button[i]:
+                mouse_pos = pygame.mouse.get_pos()
+                if self.up_rect.collidepoint(mouse_pos):
+                    pygame.time.delay(500)
+                    self.rect.y -= self.speed
+                elif self.down_rect.collidepoint(mouse_pos):
+                    pygame.time.delay(500)
+                    self.rect.y += self.speed
+                elif self.left_rect.collidepoint(mouse_pos):
+                    pygame.time.delay(500)
+                    self.rect.x -= self.speed
+                elif self.right_rect.collidepoint(mouse_pos):
+                    pygame.time.delay(500)
+                    self.rect.x += self.speed   
+            self.prev_mouse_button = mouse_button[:]
+        
+        self.collisions('horizontal')
+        self.collisions('vertical')
+
+    def draw(self):
+        screen.blit(self.image, self.rect)
+        screen.blit(self.image_up, self.up_rect)
+        screen.blit(self.image_down, self.down_rect)
+        screen.blit(self.image_left, self.left_rect)
+        screen.blit(self.image_right, self.right_rect)
+        screen.blit(self.image_search, self.search_rect)
+        screen.blit(self.health_bar_img, (self.health_bar_img_rect))
+        screen.blit(self.health_container,(self.health_container_rect))
+        
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, x, y, image, health, attack):
+        self.health = 5
+        self.attack = 1
+
+class Wall(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = wall_image
+        self.rect = self.image.get_rect(topleft=(x * TILE_SIZE, y * TILE_SIZE))
+        self.old_rect = self.rect.copy()
+
+class Landscape(pygame.sprite.Sprite):
+    def __init__(self, x, y, image):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect(topleft=(x * TILE_SIZE, y * TILE_SIZE))
+    def draw(self):
+        screen.blit(self.image, self.rect)
+
+class Exit(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = exit_image
+        self.rect = self.image.get_rect(topleft=(x * TILE_SIZE, y * TILE_SIZE))
+        self.old_rect = self.rect.copy()
+    def draw(self):
+        screen.blit(self.image, self.rect)
+
+class Hut(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = hut_image
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.old_rect = self.rect.copy()
+    def draw(self):
+        screen.blit(self.image, self.rect)
+
+class Firepit(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = firepit_image
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.old_rect = self.rect.copy()
+    def draw(self):
+        screen.blit(self.image, self.rect)
+
+class Produce(pygame.sprite.Sprite):  #Used in village screen
+    def __init__(self, x,y,type,image):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect(topleft = (x,y))
+        self.buy_more_img = plus_img
+        self.buy_more_rect = self.buy_more_img.get_rect(topleft = (x+50,y))
+        self.buy_less_img = minus_img
+        self.buy_less_rect = self.buy_less_img.get_rect(topleft = (x+50,y+25))
+        self.type = type
+        self.font = pygame.font.SysFont('forte', 35)
+        self.font2 = pygame.font.SysFont('comicsans', 12)
+        self.font3 = pygame.font.SysFont('rockwell', 12)
+
+        self.wood_amount = 0
+        self.stone_amount = 0
+        self.iron_amount = 0
+        self.gold_amount = 0
+        self.charcoal_amount = 0
+
+        self.wood_price = 1
+        self.stone_price = 2
+        self.iron_price = 5
+        self.gold_price = 10
+        self.charcoal_price = 2
+
+    def update(self):
+        self.buysell()
+        self.resources()
+
+    def resources(self):
+        if self.wood_amount <= 0:
+            self.wood_amount = 0
+            self.wood_total = 0
+
+        if self.stone_amount <= 0:
+            self.stone_amount = 0
+            self.stone_total = 0
+
+        if self.iron_amount <= 0:
+            self.iron_amount = 0
+            self.iron_total = 0
+
+        if self.gold_amount <= 0:
+            self.gold_amount = 0
+            self.gold_total = 0
+
+        if self.charcoal_amount <= 0:
+            self.charcoal_amount = 0
+            self.charcoal_total = 0
+
+        self.wood_text = self.font.render(str(self.wood_amount), True, ('black'))
+        self.stone_text = self.font.render(str(self.stone_amount), True, ('black'))
+        self.iron_text = self.font.render(str(self.iron_amount), True, ('black'))
+        self.gold_text = self.font.render(str(self.gold_amount), True, ('black'))
+        self.charcoal_text = self.font.render(str(self.charcoal_amount), True, ('black'))
+
+        self.wood_text_rect = self.wood_text.get_rect(center = (140,125))
+        self.stone_text_rect = self.stone_text.get_rect(center = (140,185))
+        self.iron_text_rect = self.iron_text.get_rect(center = (140,245))
+        self.gold_text_rect = self.gold_text.get_rect(center = (140,305))
+        self.charcoal_text_rect = self.charcoal_text.get_rect(center = (140,365))
+        
+        self.type_text = self.font3.render(str(self.type), True, ('black'))
+
+    def buysell(self):
+
+        self.wood_total = self.wood_amount * self.wood_price
+        self.stone_total = self.stone_amount * self.stone_price
+        self.iron_total = self.iron_amount * self.iron_price
+        self.gold_total = self.gold_amount * self.gold_price
+        self.charcoal_total = self.charcoal_amount * self.charcoal_price
+
+        self.total_cost = self.wood_total + self.stone_total + self.iron_total + self.gold_total + self.charcoal_total
+
+        self.wood_text_price = self.font.render(str(self.wood_price), True, ('black'))
+        self.stone_text_price = self.font.render(str(self.stone_price), True, ('black'))
+        self.iron_text_price = self.font.render(str(self.iron_price), True, ('black'))
+        self.gold_text_price = self.font.render(str(self.gold_price), True, ('black'))
+        self.charcoal_text_price = self.font.render(str(self.charcoal_price), True, ('black'))
+
+        self.wood_text_total = self.font.render(str(self.wood_total), True, ('black'))
+        self.stone_text_total = self.font.render(str(self.stone_total), True, ('black'))
+        self.iron_text_total = self.font.render(str(self.iron_total), True, ('black'))
+        self.gold_text_total = self.font.render(str(self.gold_total), True, ('black'))
+        self.charcoal_text_total = self.font.render(str(self.charcoal_total), True, ('black'))
+
+    def draw_wood(self):
+        screen.blit(self.type_text, (self.rect.x, self.rect.y-13))
+        screen.blit(self.image,self.rect)
+        screen.blit(self.buy_less_img,self.buy_less_rect)
+        screen.blit(self.buy_more_img,self.buy_more_rect)
+        screen.blit(self.wood_text, self.wood_text_rect)
+        screen.blit(self.wood_text_price, (170,105))
+        screen.blit(self.wood_text_total, (205,105))
+
+    def draw_stone(self):
+        screen.blit(self.type_text, (self.rect.x, self.rect.y-13))
+        screen.blit(self.image,self.rect)
+        screen.blit(self.buy_less_img,self.buy_less_rect)
+        screen.blit(self.buy_more_img,self.buy_more_rect)
+        screen.blit(self.stone_text, self.stone_text_rect)
+        screen.blit(self.stone_text_price, (170,165))
+        screen.blit(self.stone_text_total, (205,165))
+
+    def draw_iron(self):
+        screen.blit(self.type_text, (self.rect.x, self.rect.y-13))
+        screen.blit(self.image,self.rect)
+        screen.blit(self.buy_less_img,self.buy_less_rect)
+        screen.blit(self.buy_more_img,self.buy_more_rect)
+        screen.blit(self.iron_text, self.iron_text_rect)
+        screen.blit(self.iron_text_price, (170,225))
+        screen.blit(self.iron_text_total, (205,225))
+
+    def draw_gold(self):
+        screen.blit(self.type_text, (self.rect.x, self.rect.y-13))
+        screen.blit(self.image,self.rect)
+        screen.blit(self.buy_less_img,self.buy_less_rect)
+        screen.blit(self.buy_more_img,self.buy_more_rect)
+        screen.blit(self.gold_text, self.gold_text_rect)
+        screen.blit(self.gold_text_price, (163,285))
+        screen.blit(self.gold_text_total, (205,285))
+
+    def draw_charcoal(self):
+        screen.blit(self.type_text, (self.rect.x, self.rect.y-13))
+        screen.blit(self.image,self.rect)
+        screen.blit(self.buy_less_img,self.buy_less_rect)
+        screen.blit(self.buy_more_img,self.buy_more_rect)
+        screen.blit(self.charcoal_text, self.charcoal_text_rect)
+        screen.blit(self.charcoal_text_price, (170,345))
+        screen.blit(self.charcoal_text_total, (205,345))
+
+class Clickable(pygame.sprite.Sprite):
+    def __init__(self, x, y, image):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect(topleft = (x,y))
+    def draw(self, screen):
+        screen.blit(self.image, (self.rect))
+
+class ExchangeControls(pygame.sprite.Sprite):
+    def __init__(self, x,y):
+        self.buy_more_img = plus_img
+        self.buy_more_rect = self.buy_more_img.get_rect(topleft = (x,y))
+        self.buy_less_img = minus_img
+        self.buy_less_rect = self.buy_less_img.get_rect(topleft = (x,y+25))
+    
+    def update(self):
+        self.text()
+        self.controls()
+
+    def draw(self):
+        screen.blit(self.buy_less_img,self.buy_less_rect)
+        screen.blit(self.buy_more_img,self.buy_more_rect)
+
+    def text(self):
+        self.font = pygame.font.SysFont('forte', 35)
+        self.copper_amount_text = self.font.render(str(copper_ex_amount), True, ('black'))
+        self.silver_amount_text = self.font.render(str(silver_ex_amount), True, ('black'))
+        screen.blit(self.silver_amount_text, (55,170))
+        screen.blit(self.copper_amount_text, (55,330))
+
+    def controls(self):
+        self.silver_recieved = round((copper_ex_amount /10))
+        self.gold_recieved = round((silver_ex_amount /10))
+        self.silver_recieved_text = self.font.render(str(self.silver_recieved), True, ('black'))
+        self.gold_recieved_text = self.font.render(str(self.gold_recieved), True, ('black'))
+        screen.blit(self.silver_recieved_text, (200,330))
+        screen.blit(self.gold_recieved_text, (200,170))
+
+class WeaponControls(pygame.sprite.Sprite):
+    def __init__(self, x,y,image,info_image, attack):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect(topleft = (x,y))
+        self.x = x
+        self.y = y
+        self.info_image = info_image
+        self.info_rect = self.info_image.get_rect(topleft = (350,50))
+        self.attack = attack
+
+    def update(self):
+        self.draw(screen)
+    
+    def draw(self,screen):
+        screen.blit(self.image, self.rect)
+
+class SmelterControls(pygame.sprite.Sprite):
+    def __init__(self, x,y,image,info_image, info_x, info_y, resource_image):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect(topleft = (x,y))
+        self.x = x
+        self.y = y
+        self.item_amount = 0
+        self.info_image = info_image
+        self.info_rect = self.info_image.get_rect(topleft = (info_x,info_y))
+        self.info_x = info_x
+        self.info_y = info_y
+        self.resource_image = resource_image
+        self.resource_rect = self.resource_image.get_rect(topleft = (650,65))
+
+    def update(self):
+        self.draw(screen)
+    
+    def draw(self,screen):
+        screen.blit(self.image, self.rect)
+        screen.blit(self.info_image, self.info_rect)
+
+dagger_test = WeaponControls(40, 100, dagger_img, dagger_info_img, 1)
+ #Iron Weapons
+dagger = WeaponControls(40, 100, dagger_img, dagger_info_img, 1)
+sword = WeaponControls(40, 160, sword_img, sword_info_img, 1)
+axe = WeaponControls(40, 220, axe_img, axe_info_img, 1)
+mace = WeaponControls(40, 280, mace_img,mace_info_img, 1)
+spear = WeaponControls(40, 340, spear_img, spear_info_img, 1)
+club = WeaponControls(40, 400, club_img,club_info_img, 1)
+#Silver weapons
+sdagger = WeaponControls(120, 100, sdagger_img, sdagger_info_img, 1)
+ssword = WeaponControls(120, 160, ssword_img, ssword_info_img, 1)
+saxe = WeaponControls(120, 220, saxe_img, saxe_info_img, 1)
+smace = WeaponControls(120, 280, smace_img,smace_info_img, 1)
+sspear = WeaponControls(120, 340, sspear_img, sspear_info_img, 1)
+sclub = WeaponControls(120, 400, sclub_img,sclub_info_img, 1)
+#Gold Weapons
+gdagger = WeaponControls(195, 100, gdagger_img, sdagger_info_img, 1)
+gsword = WeaponControls(195, 160, gsword_img, ssword_info_img, 1)
+gaxe = WeaponControls(195, 220, gaxe_img, saxe_info_img, 1)
+gmace = WeaponControls(195, 280, gmace_img,smace_info_img, 1)
+gspear = WeaponControls(195, 340, gspear_img, sspear_info_img, 1)
+gclub = WeaponControls(195, 400, gclub_img,sclub_info_img, 1)
+
+class GameState():
+    def __init__(self):
+        self.state = 'intro'
+        self.player_position = (3, 6)
+
+    def state_manager(self):
+        if self.state == 'intro':
+            self.intro()
+
+        if self.state == 'main_screen':
+            self.main_screen()
+            self.player = Player(self.player_position[0], self.player_position[1], wall_tiles)
+
+        if self.state == 'village_screen':
+            self.village_screen()
+
+        if self.state == 'encounter_screen':
+            self.encounter_screen()
+
+        if self.state == 'exit_screen':
+            self.exit_screen()
+
+        if self.state == 'forge_screen':
+            self.forge_screen()
+        
+        if self.state == 'smelter_screen':
+            self.smelter_screen()
+
+        if self.state == 'exchange_screen':
+            self.exchange_screen()
+
+        if self.state == 'weapon_screen':
+            self.weapon_screen()
+
+        if self.state == 'firepit_screen':
+            self.firepit_screen()
+
+        if self.state == 'inventory_screen':
+            self.inventory_screen()
+
+    def change_state(self, new_state):
+        self.state = new_state
+
+
+
+    def intro(self):
+        forest_group.empty()
+        hill_group.empty()
+        iron_mountain_group.empty()
+        silver_mountain_group.empty()
+        gold_mountain_group.empty()
+        exit = Landscape(1, 11, exit_image)
+        forge_hut = Hut(290,273)
+        smelter_hut = Hut(546,283)
+        firepit_hs = Clickable(440,400, firepit_img)
+
+        pygame.display.set_caption("Homestead")
+        
+
+        resource_font = pygame.font.SysFont('forte',30)
+        
+        player_gold_homestead = resource_font.render(str(player_gold), True, ('black'))
+        player_silver_homestead = resource_font.render(str(player_silver), True, ('black'))
+        player_copper_homestead = resource_font.render(str(player_copper), True, ('black'))
+
+        screen.blit(gold_coin_image, (35,510))
+        screen.blit(silver_coin_image, (118,510))
+        screen.blit(copper_coin_image, (200,510))
+        screen.blit(player_gold_homestead, (42,510))
+        screen.blit(player_silver_homestead, (128,510))
+        screen.blit(player_copper_homestead, (210,510))
+
+        def text(self):
+            self.font_2 = pygame.font.SysFont('forte',25)
+            self.player_wood_text = self.font_2.render(str(player_wood), True, ('black'))
+            screen.blit(self.player_wood_text, (560,138))
+            self.player_stone_text = self.font_2.render(str(player_stone), True, ('black'))
+            screen.blit(self.player_stone_text, (605,138))
+            self.player_iron_text = self.font_2.render(str(player_ironore), True, ('black'))
+            screen.blit(self.player_iron_text, (650,138))
+            self.player_gold_text = self.font_2.render(str(player_goldore), True, ('black'))
+            screen.blit(self.player_gold_text, (692,138))
+            self.player_charcoal_text = self.font_2.render(str(player_charcoal), True, ('black'))
+            screen.blit(self.player_charcoal_text, (737,138))
+
+        intro_running = True
+        while intro_running:
+            for event in pygame.event.get():
+                mouse_pos = pygame.mouse.get_pos()
+                screen.blit(intro_bg, (0,0))
+                exit_tile.add(exit, forge_hut, smelter_hut, firepit_hs)
+                exit_tile.update()
+                exit_tile.draw(screen)
+
+                if event.type == pygame.QUIT:
+                    quit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if exit.rect.collidepoint(mouse_pos):
+                        exit_tile.remove(exit, forge_hut, smelter_hut, firepit_hs)
+                        intro_running = False
+                        self.change_state('main_screen')
+                    if forge_hut.rect.collidepoint(mouse_pos):
+                        exit_tile.remove(exit, forge_hut, smelter_hut, firepit_hs)
+                        intro_running = False
+                        self.change_state('forge_screen')
+                    if smelter_hut.rect.collidepoint(mouse_pos):
+                        exit_tile.remove(exit, forge_hut, smelter_hut, firepit_hs)
+                        intro_running = False
+                        self.change_state('smelter_screen')
+                    if firepit_hs.rect.collidepoint(mouse_pos):
+                        exit_tile.remove(exit, forge_hut, smelter_hut, firepit_hs)
+                        intro_running = False
+                        self.change_state('firepit_screen')
+
+                if forge_hut.rect.collidepoint(mouse_pos):
+                    screen.blit(enter_forge_banner, mouse_pos)
+                if smelter_hut.rect.collidepoint(mouse_pos):
+                    screen.blit(enter_smelter_banner, mouse_pos)
+                if firepit_hs.rect.collidepoint(mouse_pos):
+                    screen.blit(craft_charcoal_banner, mouse_pos)
+            screen.blit(gold_coin_image, (35,510))
+            screen.blit(silver_coin_image, (118,510))
+            screen.blit(copper_coin_image, (200,510))
+            screen.blit(player_gold_homestead, (42,510))
+            screen.blit(player_silver_homestead, (128,510))
+            screen.blit(player_copper_homestead, (210,510))
+            text(self)        
+            pygame.display.update()
+
+    def forge_screen(self):
+        global player_wood, player_stone, player_ironbar, player_silverbar, player_goldbar, player_charcoal
+        global player_dagger, player_sword, player_axe, player_mace, player_spear, player_club
+        global player_sdagger, player_ssword, player_saxe, player_smace, player_sspear, player_sclub
+        global player_gdagger, player_gsword, player_gaxe, player_gmace, player_gspear, player_gclub
+        pygame.display.set_caption("THE WOODSMAN - Forge")
+        screen.fill('steelblue3')
+        screen.blit(forge_bg, (0,0))
+        exit = Clickable(100, 465, exit_img2)
+       
+        
+
+        def text(self):
+            self.font = pygame.font.SysFont('forte', 35)
+            self.font_2 = pygame.font.SysFont('forte', 25)
+            #Resources Text
+            self.player_wood_text = self.font.render(str(player_wood), True, ('black'))
+            screen.blit(self.player_wood_text, (350,490))
+            self.player_stone_text = self.font.render(str(player_stone), True, ('black'))
+            screen.blit(self.player_stone_text, (420,490))
+            self.player_ironbar_text = self.font.render(str(player_ironbar), True, ('black'))
+            screen.blit(self.player_ironbar_text, (488,490))
+            self.player_silverbar_text = self.font.render(str(player_silverbar), True, ('black'))
+            screen.blit(self.player_silverbar_text, (555,490))
+            self.player_goldbar_text = self.font.render(str(player_goldbar), True, ('black'))
+            screen.blit(self.player_goldbar_text, (625,490))
+            self.player_charcoal_text = self.font.render(str(player_charcoal), True, ('black'))
+            screen.blit(self.player_charcoal_text, (693,490))
+            #Weapons Text - Iron
+            self.player_dagger_text = self.font_2.render(str(player_dagger), True, ('black'))
+            screen.blit(self.player_dagger_text, (73,124))
+            self.player_sword_text = self.font_2.render(str(player_sword), True, ('black'))
+            screen.blit(self.player_sword_text, (73,185))
+            self.player_axe_text = self.font_2.render(str(player_axe), True, ('black'))
+            screen.blit(self.player_axe_text, (73,245))
+            self.player_mace_text = self.font_2.render(str(player_mace), True, ('black'))
+            screen.blit(self.player_mace_text, (73,305))
+            self.player_spear_text = self.font_2.render(str(player_spear), True, ('black'))
+            screen.blit(self.player_spear_text, (73,365))
+            self.player_club_text = self.font_2.render(str(player_club), True, ('black'))
+            screen.blit(self.player_club_text, (73,425))
+            #Weapons Text - Silver
+            self.player_sdagger_text = self.font_2.render(str(player_sdagger), True, ('black'))
+            screen.blit(self.player_sdagger_text, (154,124))
+            self.player_ssword_text = self.font_2.render(str(player_ssword), True, ('black'))
+            screen.blit(self.player_ssword_text, (154,185))
+            self.player_saxe_text = self.font_2.render(str(player_saxe), True, ('black'))
+            screen.blit(self.player_saxe_text, (154,245))
+            self.player_smace_text = self.font_2.render(str(player_smace), True, ('black'))
+            screen.blit(self.player_smace_text, (154,305))
+            self.player_sspear_text = self.font_2.render(str(player_sspear), True, ('black'))
+            screen.blit(self.player_sspear_text, (154,365))
+            self.player_sclub_text = self.font_2.render(str(player_sclub), True, ('black'))
+            screen.blit(self.player_sclub_text, (154,425))
+            #Weapons Text - Gold
+            self.player_gdagger_text = self.font_2.render(str(player_gdagger), True, ('black'))
+            screen.blit(self.player_gdagger_text, (229,124))
+            self.player_gsword_text = self.font_2.render(str(player_gsword), True, ('black'))
+            screen.blit(self.player_gsword_text, (229,185))
+            self.player_gaxe_text = self.font_2.render(str(player_gaxe), True, ('black'))
+            screen.blit(self.player_gaxe_text, (229,245))
+            self.player_gmace_text = self.font_2.render(str(player_gmace), True, ('black'))
+            screen.blit(self.player_gmace_text, (229,305))
+            self.player_gspear_text = self.font_2.render(str(player_gspear), True, ('black'))
+            screen.blit(self.player_gspear_text, (229,365))
+            self.player_gclub_text = self.font_2.render(str(player_gclub), True, ('black'))
+            screen.blit(self.player_gclub_text, (229,425))
+
+        forge_running = True
+        while forge_running:
+            for event in pygame.event.get():
+                screen.blit(forge_bg, (0,0))
+                mouse_pos = pygame.mouse.get_pos()
+                weapons_group.add(dagger, sword, axe, mace, spear, club, sdagger, ssword, saxe, smace, sspear, sclub, gdagger, gsword, gaxe, gmace, gspear, gclub)
+                exit_tile.add(exit)
+                weapons_group.update()
+                weapons_group.draw(screen)
+                all_sprites.update()
+                all_sprites.draw(screen)
+                exit_tile.update()
+                exit_tile.draw(screen)
+                text(self)
+
+                if event.type == pygame.QUIT:
+                    quit()
+
+                if event.type == pygame.MOUSEBUTTONDOWN and exit.rect.collidepoint(mouse_pos):
+                    exit_tile.empty()
+                    forge_running = False
+                    weapons_group.empty()
+                    all_sprites.empty()
+                    self.change_state('intro')
+                #Dagger Craft
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 5 and player_ironbar >=5 and player_charcoal >= 10 and player_dagger <2:
+                        if dagger.rect.collidepoint(mouse_pos):
+                            player_dagger += 1
+                            player_wood -= 5
+                            player_ironbar -= 5
+                            player_charcoal -= 10
+                            forge_running = False
+                            player_weapons.add(dagger)
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')
+                if player_wood >= 5 and player_ironbar >=5 and player_charcoal >= 10 and player_dagger < 2:
+                    if dagger.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if dagger.rect.collidepoint(mouse_pos):
+                    screen.blit(dagger_info_img, (350,50))
+                #Sword Craft
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 10 and player_ironbar >=15 and player_charcoal >= 50 and player_stone >=2 and player_sword < 2:
+                        if sword.rect.collidepoint(mouse_pos):
+                            player_sword += 1
+                            player_wood -= 10
+                            player_stone -= 2
+                            player_ironbar -= 15
+                            player_charcoal -= 50
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')
+                if player_wood >= 10 and player_ironbar >=15 and player_charcoal >= 50 and player_stone >=2 and player_sword < 2:
+                    if sword.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if sword.rect.collidepoint(mouse_pos):
+                    screen.blit(sword_info_img, (350,50))
+                #Craft Axe
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 15 and player_ironbar >=25 and player_charcoal >= 50 and player_stone >=5 and player_axe < 2:
+                        if axe.rect.collidepoint(mouse_pos):
+                            player_axe += 1
+                            player_wood -= 15
+                            player_stone -= 5
+                            player_ironbar -= 25
+                            player_charcoal -= 50
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')
+                if player_wood >= 15 and player_ironbar >=25 and player_charcoal >= 50 and player_stone >=5 and player_axe < 2:
+                    if axe.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if axe.rect.collidepoint(mouse_pos):
+                    screen.blit(axe_info_img, (350,50))
+                #Craft Mace
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 20 and player_ironbar >=40 and player_charcoal >= 80 and player_stone >=5 and player_mace < 2:
+                        if mace.rect.collidepoint(mouse_pos):
+                            player_mace += 1
+                            player_wood -= 20
+                            player_stone -= 5
+                            player_ironbar -= 40
+                            player_charcoal -= 80
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')
+                if player_wood >= 20 and player_ironbar >=40 and player_charcoal >= 80 and player_stone >=5 and player_mace < 2:
+                    if mace.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if mace.rect.collidepoint(mouse_pos):
+                    screen.blit(mace_info_img, (350,50))
+                #Craft Spear
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 50 and player_ironbar >=5 and player_charcoal >= 5 and player_stone >=2 and player_spear < 2:
+                        if spear.rect.collidepoint(mouse_pos):
+                            player_spear += 1
+                            player_wood -= 50
+                            player_stone -= 2
+                            player_ironbar -= 5
+                            player_charcoal -= 5
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')
+                if player_wood >= 50 and player_ironbar >=5 and player_charcoal >= 5 and player_stone >=2 and player_spear < 2:
+                    if spear.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if spear.rect.collidepoint(mouse_pos):
+                        screen.blit(spear_info_img, (350,50))
+                #Craft Club
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 100 and player_charcoal >= 5 and player_stone >=5 and player_club < 2:
+                        if club.rect.collidepoint(mouse_pos):
+                            player_club += 1
+                            player_wood -= 100
+                            player_stone -= 5
+                            player_charcoal -= 5
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')
+                if player_wood >= 100 and player_charcoal >= 5 and player_stone >=5 and player_club < 2:
+                    if club.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if club.rect.collidepoint(mouse_pos):
+                        screen.blit(club_info_img, (350,50))
+
+                #Silver Dagger Craft
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 20 and player_stone >= 10 and player_ironbar >=5 and player_charcoal >= 25 and player_silverbar >= 5 and player_sdagger <2:
+                        if sdagger.rect.collidepoint(mouse_pos):
+                            player_sdagger += 1
+                            player_wood -= 20
+                            player_stone -= 10
+                            player_ironbar -= 5
+                            player_silverbar -= 5
+                            player_charcoal -= 25
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')
+                if player_wood >= 20 and player_stone >= 10 and player_ironbar >=5 and player_charcoal >= 25 and player_silverbar >= 5 and player_sdagger <2:
+                    if sdagger.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if sdagger.rect.collidepoint(mouse_pos):
+                    screen.blit(sdagger_info_img, (350,50))
+                #Silver Sword Craft
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 25 and player_stone >= 10 and player_ironbar >=20 and player_silverbar >= 25 and player_charcoal >= 90 and player_ssword < 2:
+                        if ssword.rect.collidepoint(mouse_pos):
+                            player_ssword += 1
+                            player_wood -= 25
+                            player_stone -= 10
+                            player_ironbar -= 20
+                            player_silverbar -= 25
+                            player_charcoal -= 90
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')
+                if player_wood >= 25 and player_stone >= 10 and player_ironbar >=20 and player_silverbar >= 25 and player_charcoal >= 90 and player_ssword < 2:
+                    if ssword.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if ssword.rect.collidepoint(mouse_pos):
+                    screen.blit(ssword_info_img, (350,50))
+                #Craft Silver Axe
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 30 and player_stone >=10 and player_ironbar >=25 and player_silverbar >= 30 and player_charcoal >= 100 and player_saxe < 2:
+                        if saxe.rect.collidepoint(mouse_pos):
+                            player_saxe += 1
+                            player_wood -= 30
+                            player_stone -= 10
+                            player_ironbar -= 25
+                            player_silverbar -= 30
+                            player_charcoal -= 50
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')
+                if player_wood >= 30 and player_stone >=10 and player_ironbar >=25 and player_silverbar >= 30 and player_charcoal >= 100 and player_saxe < 2:
+                    if saxe.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if saxe.rect.collidepoint(mouse_pos):
+                    screen.blit(saxe_info_img, (350,50))
+                #Craft Silver Mace
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 60 and player_stone >=20 and player_ironbar >=20 and player_silverbar >= 50 and player_charcoal >= 150 and player_smace < 2:
+                        if smace.rect.collidepoint(mouse_pos):
+                            player_smace += 1
+                            player_wood -= 60
+                            player_stone -= 20
+                            player_ironbar -= 20
+                            player_silverbar -= 50
+                            player_charcoal -= 150
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')
+                if player_wood >= 60 and player_stone >=20 and player_ironbar >=20 and player_silverbar >= 50 and player_charcoal >= 150 and player_smace < 2:
+                    if smace.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if smace.rect.collidepoint(mouse_pos):
+                    screen.blit(smace_info_img, (350,50))
+                #Craft Silver Spear
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 150 and player_stone >=50 and player_ironbar >=20 and player_silverbar >= 20 and player_charcoal >= 80  and player_sspear < 2:
+                        if sspear.rect.collidepoint(mouse_pos):
+                            player_sspear += 1
+                            player_wood -= 150
+                            player_stone -= 50
+                            player_ironbar -= 20
+                            player_silverbar -= 20
+                            player_charcoal -= 80
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')
+                if player_wood >= 150 and player_stone >=50 and player_ironbar >=20 and player_silverbar >= 20 and player_charcoal >= 80  and player_sspear < 2:
+                    if sspear.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if sspear.rect.collidepoint(mouse_pos):
+                        screen.blit(sspear_info_img, (350,50))
+                #Craft SilverClub
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 200 and player_stone >=50 and player_ironbar >=5 and player_silverbar >= 50  and player_charcoal >= 200 and player_sclub < 2:
+                        if sclub.rect.collidepoint(mouse_pos):
+                            player_sclub += 1
+                            player_wood -= 200
+                            player_stone -= 50
+                            player_ironbar -= 5
+                            player_silverbar -= 50
+                            player_charcoal -= 200
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')  
+                if player_wood >= 200 and player_stone >=50 and player_ironbar >=5 and player_silverbar >= 50  and player_charcoal >= 200 and player_sclub < 2:
+                    if sclub.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if sclub.rect.collidepoint(mouse_pos):
+                        screen.blit(sclub_info_img, (350,50))
+
+                #Craft Golden Dagger
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 20 and player_stone >= 10 and player_ironbar >=10 and player_silverbar >= 10 and player_goldbar >= 10 and player_charcoal >= 60 and player_gdagger <2:
+                        if gdagger.rect.collidepoint(mouse_pos):
+                            player_gdagger += 1
+                            player_wood -= 20
+                            player_stone -= 20
+                            player_ironbar -= 10
+                            player_silverbar -= 10
+                            player_goldbar -= 10
+                            player_charcoal -= 60
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')
+                if player_wood >= 20 and player_stone >= 10 and player_ironbar >=10 and player_silverbar >= 10 and player_goldbar >= 10 and player_charcoal >= 60 and player_gdagger <2:
+                    if gdagger.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if gdagger.rect.collidepoint(mouse_pos):
+                    screen.blit(gdagger_info_img, (350,50))
+                #Craft Golden Sword
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 25 and player_stone >= 10 and player_ironbar >=20 and player_silverbar >= 25 and player_goldbar >= 20 and player_charcoal >= 150 and player_gsword <2:
+                        if gsword.rect.collidepoint(mouse_pos):
+                            player_gsword += 1
+                            player_wood -= 25
+                            player_stone -= 10
+                            player_ironbar -= 20
+                            player_silverbar -= 25
+                            player_goldbar -= 20
+                            player_charcoal -= 150
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')
+                if player_wood >= 25 and player_stone >= 10 and player_ironbar >=20 and player_silverbar >= 25 and player_goldbar >= 20 and player_charcoal >= 150 and player_gsword <2:
+                    if gsword.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if gsword.rect.collidepoint(mouse_pos):
+                    screen.blit(gsword_info_img, (350,50))
+                #Craft Golden Axe
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 60 and player_stone >=20 and player_ironbar >=30 and player_silverbar >= 30 and player_goldbar >= 30 and player_charcoal >= 175 and player_gaxe < 2:
+                        if gaxe.rect.collidepoint(mouse_pos):
+                            player_gaxe += 1
+                            player_wood -= 60
+                            player_stone -= 20
+                            player_ironbar -= 30
+                            player_silverbar -= 30
+                            player_goldbar -= 30
+                            player_charcoal -= 175
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')
+                if player_wood >= 60 and player_stone >=20 and player_ironbar >=30 and player_silverbar >= 30 and player_goldbar >= 30 and player_charcoal >= 175 and player_gaxe < 2:
+                    if gaxe.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if gaxe.rect.collidepoint(mouse_pos):
+                    screen.blit(gaxe_info_img, (350,50))
+                #Craft Golden Mace
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 80 and player_stone >=30 and player_ironbar >=40 and player_silverbar >= 40 and player_goldbar >= 40 and player_charcoal >= 200 and player_gmace < 2:
+                        if gmace.rect.collidepoint(mouse_pos):
+                            player_gmace += 1
+                            player_wood -= 80
+                            player_stone -= 30
+                            player_ironbar -= 40
+                            player_silverbar -= 40
+                            player_goldbar -= 40
+                            player_charcoal -= 150
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')
+                if player_wood >= 80 and player_stone >=30 and player_ironbar >=40 and player_silverbar >= 40 and player_goldbar >= 40 and player_charcoal >= 200 and player_gmace < 2:
+                    if gmace.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if gmace.rect.collidepoint(mouse_pos):
+                    screen.blit(gmace_info_img, (350,50))
+                #Craft Golden Spear
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 200 and player_stone >=50 and player_ironbar >=10 and player_silverbar >= 10 and player_goldbar >= 10 and player_charcoal >= 90  and player_gspear < 2:
+                        if gspear.rect.collidepoint(mouse_pos):
+                            player_gspear += 1
+                            player_wood -= 150
+                            player_stone -= 50
+                            player_ironbar -= 20
+                            player_silverbar -= 20
+                            player_goldbar -= 0
+                            player_charcoal -= 80
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')
+                if player_wood >= 200 and player_stone >=50 and player_ironbar >=10 and player_silverbar >= 10 and player_goldbar >= 10 and player_charcoal >= 90  and player_gspear < 2:
+                    if gspear.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if gspear.rect.collidepoint(mouse_pos):
+                        screen.blit(gspear_info_img, (350,50))
+                #Craft Gold Club
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 400 and player_stone >=20 and player_ironbar >=20 and player_silverbar >= 20 and player_goldbar >= 20  and player_charcoal >= 300 and player_gclub < 2:
+                        if gclub.rect.collidepoint(mouse_pos):
+                            player_gclub += 1
+                            player_wood -= 400
+                            player_stone -= 20
+                            player_ironbar -= 20
+                            player_silverbar -= 20
+                            player_goldbar -= 20
+                            player_charcoal -= 300
+                            forge_running = False
+                            weapons_group.empty()
+                            exit_tile.empty()
+                            self.change_state('weapon_screen')  
+                if player_wood >= 400 and player_stone >=20 and player_ironbar >=20 and player_silverbar >= 20 and player_goldbar >= 20  and player_charcoal >= 300 and player_gclub < 2:
+                    if gclub.rect.collidepoint(mouse_pos):
+                        screen.blit(craft_click_img, mouse_pos)
+                if gclub.rect.collidepoint(mouse_pos):
+                        screen.blit(gclub_info_img, (350,50))
+                
+
+            pygame.display.update()
+
+    def weapon_screen(self):
+        pygame.display.set_caption("THE WOODSMAN - Craft Success")
+        screen.blit(weapon_craft_bg, (0,0))
+        screen.blit(weapon_screen_bg, (290,230))
+        exit = Exit(13.7, 9.4)
+        weapon_running = True
+        while weapon_running:
+            for event in pygame.event.get():
+                all_sprites.add(exit)
+                mouse_pos = pygame.mouse.get_pos()
+                if event.type == pygame.QUIT:
+                        quit()
+
+                elif event.type == pygame.MOUSEBUTTONDOWN: 
+                    if exit.rect.collidepoint(mouse_pos):
+                        all_sprites.empty()
+                        weapon_running = False
+                        self.change_state('forge_screen')
+                
+            all_sprites.update()
+            all_sprites.draw(screen)
+            pygame.display.update()
+
+    def smelter_screen(self):
+        global ironore_used, silverore_used, goldore_used, charcoal_used, player_ironore, player_silverore, player_goldore, player_charcoal, player_ironbar, player_silverbar, player_goldbar
+        pygame.display.set_caption("THE WOODSMAN - Smelter")
+        screen.fill('steelblue3')
+        screen.blit(smelter_bg, (0,0))
+        exit = Clickable(100, 460, exit_img2)
+        ironbar = SmelterControls(50,125,ironbar_img,craft_button_img, 150,124, ironbar_img2)
+        silverbar = SmelterControls(50,255,silverbar_img,craft_button_img, 150,252, silverbar_img2)
+        goldbar = SmelterControls(50,380,goldbar_img,craft_button_img, 150,376, goldbar_img2)
+        draw_iron = False
+        draw_silver = False
+        draw_gold = False
+        
+
+        def player_text(self):
+            self.font = pygame.font.SysFont('forte', 35)
+            self.font_2 = pygame.font.SysFont('forte', 25)
+            self.player_ironbar_text = self.font_2.render(str(player_ironbar), True, ('black'))
+            screen.blit(self.player_ironbar_text, (373,485))
+            self.player_silverbar_text = self.font_2.render(str(player_silverbar), True, ('black'))
+            screen.blit(self.player_silverbar_text, (427,485))
+            self.player_goldbar_text = self.font_2.render(str(player_goldbar), True, ('black'))
+            screen.blit(self.player_goldbar_text, (481,485))
+            self.player_charcoal_text = self.font_2.render(str(player_charcoal), True, ('black'))
+            screen.blit(self.player_charcoal_text, (536,485))
+            self.player_iron_text = self.font_2.render(str(player_ironore), True, ('black'))
+            screen.blit(self.player_iron_text, (589,485))
+            self.player_silverore_text = self.font_2.render(str(player_silverore), True, ('black'))
+            screen.blit(self.player_silverore_text, (641,485))
+            self.player_gold_text = self.font_2.render(str(player_goldore), True, ('black'))
+            screen.blit(self.player_gold_text, (690,485))
+        def resorces_text(self):
+            self.charcoal_used_text = self.font_2.render(str(charcoal_used), True, ('black'))
+            screen.blit(self.charcoal_used_text, (450,115))
+            self.ironore_used_text = self.font_2.render(str(ironore_used), True, ('black'))
+            screen.blit(self.ironore_used_text, (505,115))
+            self.silverore_used_text = self.font_2.render(str(silverore_used), True, ('black'))
+            screen.blit(self.silverore_used_text, (556,115))
+            self.goldore_used_text = self.font_2.render(str(goldore_used), True, ('black'))
+            screen.blit(self.goldore_used_text, (609,115))
+            self.ironbar_recieved_text = self.font_2.render(str(ironbar.item_amount), True, ('black'))
+            screen.blit(self.ironbar_recieved_text, (482,240))
+            self.silverbar_recieved_text = self.font_2.render(str(silverbar.item_amount), True, ('black'))
+            screen.blit(self.silverbar_recieved_text, (535,240))
+            self.goldbar_recieved_text = self.font_2.render(str(goldbar.item_amount), True, ('black'))
+            screen.blit(self.goldbar_recieved_text, (590,240))
+            
+
+        smelter_running = True
+        while smelter_running:
+            for event in pygame.event.get():
+                screen.blit(smelter_bg, (0,0))
+                mouse_pos = pygame.mouse.get_pos()
+                exit_tile.add(exit)
+                all_sprites.add(ironbar, silverbar, goldbar)
+                player_text(self)
+                resorces_text(self)
+                all_sprites.update()
+                exit_tile.update()
+                all_sprites.draw(screen)
+                exit_tile.draw(screen)
+
+                if event.type == pygame.QUIT:
+                    quit()
+                
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if exit.rect.collidepoint(mouse_pos):
+                        exit_tile.empty()
+                        all_sprites.empty()
+                        smelter_running = False
+                        self.change_state('intro')
+# Ironbars
+                    if ironbar.rect.collidepoint(mouse_pos):
+                        charcoal_used = 5
+                        ironore_used = 1
+                        silverore_used = 0
+                        goldore_used = 0
+                        ironbar.item_amount = 1
+                        silverbar.item_amount = 0
+                        goldbar.item_amount = 0
+                        draw_iron = True
+                        draw_silver = False
+                        draw_gold = False
+                    if player_ironore >=1 and player_charcoal >= 5:
+                        if ironbar.info_rect.collidepoint(mouse_pos):
+                            player_ironbar += 1
+                            player_ironore -= 1
+                            player_charcoal -= 5
+                            charcoal_used = 5
+                            ironore_used = 1
+                            silverore_used = 0
+                            goldore_used = 0
+                            ironbar.item_amount = 1
+                            silverbar.item_amount = 0
+                            goldbar.item_amount = 0
+                            draw_iron = True
+                            draw_silver = False
+                            draw_gold = False
+                    if player_ironore <=0:
+                        player_ironore = 0
+#Silver Bars
+                    if silverbar.rect.collidepoint(mouse_pos):
+                        charcoal_used = 10
+                        silverore_used = 1
+                        ironore_used = 0
+                        goldore_used = 0
+                        silverbar.item_amount = 1
+                        ironbar.item_amount = 0
+                        goldbar.item_amount = 0
+                        draw_silver = True
+                        draw_iron = False
+                        draw_gold = False
+                    if player_silverore >=1 and player_charcoal >= 10:
+                        if silverbar.info_rect.collidepoint(mouse_pos):
+                            player_silverbar += 1
+                            player_silverore -= 1
+                            player_charcoal -= 10
+                            charcoal_used = 10
+                            silverore_used = 1
+                            ironore_used = 0
+                            goldore_used = 0
+                            silverbar.item_amount = 1
+                            ironbar.item_amount = 0
+                            goldbar.item_amount = 0
+                            draw_silver = True
+                            draw_iron = False
+                            draw_gold = False
+                    if player_silverore <=0:
+                        player_silverore = 0
+#Gold Bars
+                    if goldbar.rect.collidepoint(mouse_pos):
+                        charcoal_used = 20
+                        goldore_used = 1
+                        ironore_used = 0
+                        silverore_used = 0
+                        goldbar.item_amount = 1
+                        ironbar.item_amount = 0
+                        silverbar.item_amount = 0
+                        draw_silver = False
+                        draw_iron = False
+                        draw_gold = True
+                    if player_goldore >=1 and player_charcoal >= 20:
+                        if goldbar.info_rect.collidepoint(mouse_pos):
+                            player_goldbar += 1
+                            player_goldore -= 1
+                            player_charcoal -= 20
+                            charcoal_used = 20
+                            silverore_used = 0
+                            ironore_used = 0
+                            goldore_used = 1
+                            silverbar.item_amount = 0
+                            ironbar.item_amount = 0
+                            goldbar.item_amount = 1
+                            draw_silver = False
+                            draw_iron = False
+                            draw_gold = True
+                    if player_goldore <=0:
+                        player_goldore = 0
+
+                    if player_charcoal <= 0:
+                        player_charcoal = 0
+                
+                if draw_iron == True:
+                    screen.blit(ironbar.resource_image, ironbar.resource_rect)
+                if draw_silver == True:
+                    screen.blit(silverbar.resource_image, silverbar.resource_rect)
+                if draw_gold == True:
+                    screen.blit(goldbar.resource_image, goldbar.resource_rect)
+                
+                if ironbar.rect.collidepoint(mouse_pos) or ironbar.info_rect.collidepoint(mouse_pos):
+                    screen.blit(craft_click_img, mouse_pos)
+                if silverbar.rect.collidepoint(mouse_pos) or silverbar.info_rect.collidepoint(mouse_pos):
+                    screen.blit(craft_click_img, mouse_pos)
+                if goldbar.rect.collidepoint(mouse_pos) or goldbar.info_rect.collidepoint(mouse_pos):
+                    screen.blit(craft_click_img, mouse_pos)
+            
+            
+            pygame.display.update()
+
+    def firepit_screen(self):
+        global player_wood, player_charcoal
+        pygame.display.set_caption("THE WOODSMAN - Firepit")
+        screen.blit(intro_bg, (0,0))
+        screen.blit(firepit_bg, (150,200))
+        exit = Clickable(320, 430, exit_img2)
+        craft_charcoal = Clickable(320,280, craft_button2_img)
+        def text(self):
+            self.font_2 = pygame.font.SysFont('forte',25)
+            self.player_wood_text = self.font_2.render(str(player_wood), True, ('black'))
+            screen.blit(self.player_wood_text, (450,267))
+            self.player_charcoal_text = self.font_2.render(str(player_charcoal), True, ('black'))
+            screen.blit(self.player_charcoal_text, (450,335))
+        
+
+        firepit_running = True
+        while firepit_running:
+            for event in pygame.event.get():
+                screen.blit(firepit_bg, (150,200))
+                all_sprites.add(exit, craft_charcoal)
+                mouse_pos = pygame.mouse.get_pos()
+                if event.type == pygame.QUIT:
+                    firepit_running = False
+                    pygame.quit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if exit.rect.collidepoint(mouse_pos):
+                        all_sprites.remove(exit)
+                        all_sprites.empty()
+                        firepit_running = False
+                        self.change_state('intro')
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if player_wood >= 5:
+                        if craft_charcoal.rect.collidepoint(mouse_pos):
+                            player_charcoal += 1
+                            player_wood -= 5
+
+                all_sprites.update()
+                all_sprites.draw(screen)
+                text(self)
+
+                if craft_charcoal.rect.collidepoint(mouse_pos):
+                    screen.blit(craft_click_img, mouse_pos)
+        
+                
+            
+
+            pygame.display.update()
+
+    def main_screen(self):
+        clock = pygame.time.Clock()
+        global player_gold, player_copper ,player_silver , player_wood ,player_stone, player_ironore, player_silverore, player_goldore, player_charcoal
+        pygame.display.set_caption("WOODSMAN - World Map")
+        screen.blit(bg_image,(0,0))
+        player = Player(self.player_position[0], self.player_position[1], wall_tiles)
+        inventory = Clickable(82, 520, backpack_img)
+        firepit = Firepit(64,192)
+
+        def resources_text(self):
+            self.font_2 = pygame.font.SysFont('forte', 25)
+            self.player_wood_text = self.font_2.render(str(player_wood), True, ('black'))
+            screen.blit(self.player_wood_text, (145,450))
+            self.player_stone_text = self.font_2.render(str(player_stone), True, ('black'))
+            screen.blit(self.player_stone_text, (145,490))
+            self.player_charcoal_text = self.font_2.render(str(player_charcoal), True, ('white'))
+            screen.blit(self.player_charcoal_text, (145,530))
+            self.player_iron_text = self.font_2.render(str(player_ironore), True, ('black'))
+            screen.blit(self.player_iron_text, (199,450))
+            self.player_silverore_text = self.font_2.render(str(player_silverore), True, ('black'))
+            screen.blit(self.player_silverore_text, (199,490))
+            self.player_gold_text = self.font_2.render(str(player_goldore), True, ('black'))
+            screen.blit(self.player_gold_text, (199,530))
+
+        def main_text():
+            resource_font = pygame.font.SysFont('forte',30)
+            player_gold_main = resource_font.render(str(player_gold), True, ('black'))
+            player_silver_main = resource_font.render(str(player_silver), True, ('black'))
+            player_copper_main = resource_font.render(str(player_copper), True, ('black'))
+            screen.blit(gold_coin_image, (252,450))
+            screen.blit(silver_coin_image, (252,490))
+            screen.blit(copper_coin_image, (252,530))
+            screen.blit(player_gold_main, (260,450))
+            screen.blit(player_silver_main, (260,490))
+            screen.blit(player_copper_main, (260,530))
+
+        tilemap1 = [
+    'WWWWWWWWWWWWWWWWWWWWWWWWW',
+    'WFFGIMMMMHHGGGGGGFFFFGVGW',
+    'WFFFFGGMMMMMHHGGGFFFGGGGW',
+    'WFFFFFGGGMMMHGGGGGGMMMMGW',
+    'WGVGFFFGGGGGGGGMMMMMMGGGW',
+    'WGGGFFFGGGGSMMMMMMMMGGGWW',
+    'WGGGGGGGGGGGGGGGGGGGGGGXW',
+    'WHHHGGGGFFFFHHHGGGGGGGGWW',
+    'WHHGGGFFFFFHHGGGMMGGGGGGW',
+    'WGGGGFFFFGGGGGGMMMMGGGGGW',
+    'WGGGGGGGVGGGGMMMMAMGGVGGW',
+    'WGGGGGGGGGGMMMMMMGGGGGGGW',
+    'WWWWWWWWWWWWWWWWWWWWWWWWW',
+]
+        for row_index, row in enumerate(tilemap1):
+            for col_index, tile in enumerate(row):
+                if tile == 'W':
+                    wall_tiles.add(Wall(col_index, row_index))
+                elif tile == 'X':
+                    exit = Exit(col_index, row_index)
+                    exit_tile.add(exit)
+                elif tile == 'G':
+                    plains = Landscape(col_index, row_index, plains_image)
+                    landscape_tiles.add(plains)
+                elif tile == 'M':
+                    mountain = Landscape(col_index, row_index, mountains_image)
+                    landscape_tiles.add(mountain)
+                elif tile == 'I':
+                    iron_mountain = Landscape(col_index, row_index, iron_mountain_image)
+                    landscape_tiles.add(iron_mountain)
+                    iron_mountain_group.add(iron_mountain)
+                elif tile == 'S':
+                    silver_mountain = Landscape(col_index, row_index, silver_mountain_image)
+                    landscape_tiles.add(silver_mountain)
+                    silver_mountain_group.add(silver_mountain)
+                elif tile == 'A':
+                    gold_mountain = Landscape(col_index, row_index, gold_mountain_image)
+                    landscape_tiles.add(gold_mountain)
+                    gold_mountain_group.add(gold_mountain)
+                elif tile == 'F':
+                    forest = Landscape(col_index, row_index, forest_image)
+                    landscape_tiles.add(forest)
+                    forest_group.add(forest)
+                elif tile == 'H':
+                    hills = Landscape(col_index, row_index, hills_image)
+                    landscape_tiles.add(hills)
+                    hill_group.add(hills)
+                elif tile == 'V':
+                    village = Landscape(col_index, row_index, village_image)
+                    village_tiles.add(village)
+                #elif tile == '1':
+                #    village_1 = Village(col_index, row_index)
+                #    village_tiles.add(village_1)
+
+        
+        counter = 0
+        timer_interval = 1000
+        timer_event = pygame.USEREVENT + 1
+        pygame.time.set_timer(timer_event , timer_interval)
+        
+
+        main_running = True
+        while main_running:
+            clock.tick(60)
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_button = pygame.mouse.get_pressed()
+            self.player_position = (player.rect.x // TILE_SIZE, player.rect.y // TILE_SIZE)
+            
+            screen.blit(bg_image,(0,0))
+            landscape_tiles.add(inventory)
+
+            forest_sprites = pygame.sprite.spritecollide(player, forest_group, False)
+            hill_sprites = pygame.sprite.spritecollide(player, hill_group, False)
+            iron_mountain_sprites = pygame.sprite.spritecollide(player, iron_mountain_group, False)
+            silver_mountain_sprites = pygame.sprite.spritecollide(player, silver_mountain_group, False)
+            gold_mountain_sprites = pygame.sprite.spritecollide(player, gold_mountain_group, False)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    quit()
+                elif event.type == timer_event:
+                    counter += 1
+                    if counter == random.randrange(10,20):
+                    #if counter >= 5:
+                        exit_tile.empty()
+                        forest_group.empty()
+                        hill_group.empty()
+                        iron_mountain_group.empty()
+                        silver_mountain_group.empty()
+                        gold_mountain_group.empty()
+                        self.change_state('encounter_screen')
+                        main_running = False
+                    if counter == 20:
+                        exit_tile.empty()
+                        forest_group.empty()
+                        hill_group.empty()
+                        iron_mountain_group.empty()
+                        silver_mountain_group.empty()
+                        gold_mountain_group.empty()
+                        self.change_state('encounter_screen')
+                        main_running = False
+
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if forest_sprites:
+                        for sprite in forest_sprites:
+                            if player.search_rect.collidepoint(mouse_pos):
+                                player_wood += 1
+                                forest_group.empty()
+                                print('wood +1')
+                    if hill_sprites:
+                        for sprite in hill_sprites:
+                            if player.search_rect.collidepoint(mouse_pos):
+                                player_stone += 1
+                                print('stone +1')
+                                hill_group.empty()
+                    if iron_mountain_sprites:
+                        for sprite in iron_mountain_sprites:
+                            if player.search_rect.collidepoint(mouse_pos):
+                                player_ironore += 1
+                                print('ironore +1')
+                                iron_mountain_group.empty()
+                    if silver_mountain_sprites:
+                        for sprite in silver_mountain_sprites:
+                            if player.search_rect.collidepoint(mouse_pos):
+                                player_silverore += 1
+                                print('silverore +1')
+                                silver_mountain_group.empty()
+                    if gold_mountain_sprites:
+                        for sprite in gold_mountain_sprites:
+                            if player.search_rect.collidepoint(mouse_pos):
+                                player_goldore += 1
+                                print('goldore +1')
+                                gold_mountain_group.empty()
+
+                    if inventory.rect.collidepoint(mouse_pos):
+                        exit_tile.empty()
+                        forest_group.empty()
+                        hill_group.empty()
+                        iron_mountain_group.empty()
+                        silver_mountain_group.empty()
+                        gold_mountain_group.empty()
+                        self.change_state('inventory_screen')
+                        main_running = False
+            
+            player_sprite.add(player)
+            firepit_tile.add(firepit)
+            wall_tiles.update()
+            exit_tile.update()
+            
+            player_sprite.update(mouse_button)
+
+            wall_tiles.draw(screen)
+            landscape_tiles.draw(screen)
+            exit_tile.draw(screen)
+            village_tiles.draw(screen)
+            firepit_tile.draw(screen)
+            player.draw()
+
+            
+            screen.blit(main_banner_txt,(250,-2))
+            main_text()
+            resources_text(self)
+
+            exit_collision = pygame.sprite.spritecollide(player, exit_tile, False)
+            village_collision = pygame.sprite.spritecollide(player, village_tiles, False)
+            firepit_collision = pygame.sprite.spritecollide(player, firepit_tile, False)
+    
+            if exit_collision:
+                for sprite in exit_collision:
+                    if player.rect == sprite.rect:
+                        self.change_state('exit_screen')
+                        main_running = False
+
+            if village_collision:
+                for sprite in village_collision:
+                    if player.rect == sprite.rect:
+                        exit_tile.empty()
+                        village_tiles.empty()
+                        forest_group.empty()
+                        hill_group.empty()
+                        iron_mountain_group.empty()
+                        silver_mountain_group.empty()
+                        gold_mountain_group.empty()
+                        player_copper += 1
+                        self.change_state('village_screen')
+                        main_running = False
+
+            if firepit_collision:
+                for sprite in firepit_collision:
+                    if player.rect == sprite.rect:
+                        exit_tile.empty()
+                        forest_group.empty()
+                        hill_group.empty()
+                        iron_mountain_group.empty()
+                        silver_mountain_group.empty()
+                        gold_mountain_group.empty()
+                        self.change_state('intro')
+                        main_running = False
+            if player.search_rect.collidepoint(mouse_pos):
+                screen.blit(search_banner, mouse_pos)
+            pygame.display.update()
+
+    def inventory_screen(self):
+        pygame.display.set_caption("THE WOODSMAN - Inventory")
+        screen.blit(inventory_bg, (0,0))
+        exit = Clickable(80, 520, exit_img2)
+        
+        inventory_running = True
+        while inventory_running:
+            for event in pygame.event.get():
+                all_sprites.add(exit)
+                mouse_pos = pygame.mouse.get_pos()
+                if event.type == pygame.QUIT:
+                        inventory_running = False
+                        quit()
+
+                elif event.type == pygame.MOUSEBUTTONDOWN: 
+                    if exit.rect.collidepoint(mouse_pos):
+                        all_sprites.remove(exit)
+                        all_sprites.empty()
+                        inventory_running = False
+                        self.change_state('main_screen')
+                
+            all_sprites.update()
+            all_sprites.draw(screen)
+            pygame.display.update()
+
+    def village_screen(self):
+        forest_group.empty()
+        hill_group.empty()
+        pygame.display.set_caption("THE WOODSMAN - Village")
+        screen.fill('steelblue3')
+        wood = Produce(35,100, 'Wood', wood_img)
+        stone = Produce(35,160, 'Stone', stone_img)
+        iron = Produce(35,220, 'Iron', iron_img)
+        gold = Produce(35, 280, 'Gold', gold_img)
+        charcoal = Produce(35, 340, 'Charcoal', charcoal_img)
+        exchange = Clickable(440, 38, exchange_img)
+        exchange_button = Clickable(80, 400, exchange_button_img)
+        exit = Clickable(100, 540, exit_img2)
+        total_cost = 0
+
+        def text(self):
+            self.font = pygame.font.SysFont('forte', 35)
+            self.font_2 = pygame.font.SysFont('forte', 25)
+            self.player_copper_text = self.font.render(str(player_copper), True, ('black'))
+            self.player_silver_text = self.font.render(str(player_silver), True, ('black'))
+            self.player_gold_text = self.font.render(str(player_gold), True, ('black'))
+            screen.blit(self.player_copper_text, (40,485))
+            screen.blit(self.player_silver_text, (120,485))
+            screen.blit(self.player_gold_text, (200,485))
+
+            self.player_wood_text = self.font_2.render(str(player_wood), True, ('black'))
+            screen.blit(self.player_wood_text, (315,475))
+            self.player_stone_text = self.font_2.render(str(player_stone), True, ('black'))
+            screen.blit(self.player_stone_text, (360,475))
+            self.player_iron_text = self.font_2.render(str(player_ironore), True, ('black'))
+            screen.blit(self.player_iron_text, (405,475))
+            self.player_gold_text = self.font_2.render(str(player_goldore), True, ('black'))
+            screen.blit(self.player_gold_text, (450,475))
+            self.player_charcoal_text = self.font_2.render(str(player_charcoal), True, ('black'))
+            screen.blit(self.player_charcoal_text, (495,475))
+        
+        village_running = True
+        while village_running:
+            global player_gold, player_wood, player_stone, player_ironore, player_goldore, player_charcoal
+            mouse_pos = pygame.mouse.get_pos()
+            screen.blit(village_bg, (0,0))
+            text(self)  
+            wood.update()
+            stone.update()
+            iron.update()
+            gold.update()
+            charcoal.update()
+            exchange.draw(screen)
+            exit_tile.add(exit)
+
+            for event in pygame.event.get():
+                mouse_pos = pygame.mouse.get_pos()
+                total_cost = wood.total_cost + stone.total_cost + iron.total_cost + gold.total_cost + charcoal.total_cost
+
+                if event.type == pygame.QUIT:
+                    village_running = False
+                    quit()
+                
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if wood.buy_more_rect.collidepoint(mouse_pos):
+                        wood.wood_amount += 1
+                        if total_cost >= player_gold -1:
+                            wood.buy_more_rect.x = -100
+                            if wood.total_cost >= player_gold -1:
+                                wood.wood_amount -= 1
+                        if player_gold == 0:
+                            wood.buy_more_rect.x = -100
+                            wood.wood_amount -= 1
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if wood.buy_less_rect.collidepoint(mouse_pos):
+                        wood.wood_amount -= 1
+                        if total_cost <= player_gold:
+                            wood.buy_more_rect.x = 85
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if stone.buy_more_rect.collidepoint(mouse_pos):
+                        stone.stone_amount += 1
+                        if total_cost >= player_gold - 1:
+                            stone.buy_more_rect.x = -100
+                            if total_cost >= player_gold -1:
+                                stone.stone_amount -= 1
+                        if player_gold == 0:
+                            stone.buy_more_rect.x = -100
+                            stone.stone_amount -= 1
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if stone.buy_less_rect.collidepoint(mouse_pos):
+                        stone.stone_amount -= 1
+                        if total_cost <= player_gold:
+                            stone.buy_more_rect.x = 85
+                        
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if iron.buy_more_rect.collidepoint(mouse_pos):
+                        iron.iron_amount += 1
+                        if total_cost >= player_gold - 5:
+                            iron.buy_more_rect.x = -100
+                            if total_cost >= player_gold - 4:
+                                iron.iron_amount -= 1
+                        if player_gold <= 5:
+                            iron.buy_more_rect.x = -100
+                            iron.iron_amount -= 1
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if iron.buy_less_rect.collidepoint(mouse_pos):
+                        iron.iron_amount -= 1
+                        if total_cost <= player_gold:
+                            iron.buy_more_rect.x = 85
+
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if gold.buy_more_rect.collidepoint(mouse_pos):
+                        gold.gold_amount += 1
+                        if total_cost >= player_gold - 11:
+                            gold.buy_more_rect.x = -100
+                            if total_cost >= player_gold -10:
+                                gold.gold_amount -= 1
+                        if player_gold == 0:
+                            gold.buy_more_rect.x = -100
+                            gold.gold_amount -= 1
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if gold.buy_less_rect.collidepoint(mouse_pos):
+                        gold.gold_amount -= 1
+                        if total_cost <= player_gold:
+                            gold.buy_more_rect.x = 85
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if charcoal.buy_more_rect.collidepoint(mouse_pos):
+                        charcoal.charcoal_amount += 1
+                        if total_cost >= player_gold - 1:
+                            charcoal.buy_more_rect.x = -100
+                            if total_cost >= player_gold - 1:
+                                charcoal.charcoal_amount -= 1
+                        if player_gold == 0:
+                            charcoal.buy_more_rect.x = -100
+                            charcoal.charcoal_amount -= 1
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if charcoal.buy_less_rect.collidepoint(mouse_pos):
+                        charcoal.charcoal_amount -= 1
+                        if total_cost <= player_gold:
+                            charcoal.buy_more_rect.x = 85
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if exchange.rect.collidepoint(mouse_pos):
+                        all_sprites.remove(exchange_button)
+                        exit_tile.remove(exit)
+                        wood.wood_amount = 0
+                        stone.stone_amount = 0
+                        iron.iron_amount = 0
+                        gold.gold_amount = 0
+                        charcoal.charcoal_amount = 0 
+                        village_running = False
+                        self.change_state('exchange_screen')
+                
+
+                if event.type == pygame.MOUSEBUTTONDOWN and exit.rect.collidepoint(mouse_pos):
+                    exit_tile.remove(exit)
+                    village_running = False
+                    self.change_state('main_screen')
+                
+            if wood.wood_amount > 0:
+                all_sprites.add(exchange_button)
+                all_sprites.update()
+                all_sprites.draw(screen)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if exchange_button.rect.collidepoint(mouse_pos):
+                        all_sprites.remove(exchange_button)
+                        print('wood bought')
+                        player_wood += wood.wood_amount
+                        player_gold -= wood.wood_total
+                        wood.wood_amount = 0
+                        wood.wood_total = 0
+                        
+            if stone.stone_amount > 0:
+                all_sprites.add(exchange_button)
+                all_sprites.update()
+                all_sprites.draw(screen)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if exchange_button.rect.collidepoint(mouse_pos):
+                        all_sprites.remove(exchange_button)
+                        print('stone bought')
+                        player_stone += stone.stone_amount
+                        player_gold -= stone.stone_total
+                        stone.stone_amount = 0
+                        stone.stone_total = 0
+
+            if iron.iron_amount > 0:
+                all_sprites.add(exchange_button)
+                all_sprites.update()
+                all_sprites.draw(screen)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if exchange_button.rect.collidepoint(mouse_pos):
+                        all_sprites.remove(exchange_button)
+                        print('ironore bought')
+                        player_ironore += iron.iron_amount
+                        player_gold -= iron.iron_total
+                        iron.iron_amount = 0
+
+            if gold.gold_amount > 0:
+                all_sprites.add(exchange_button)
+                all_sprites.update()
+                all_sprites.draw(screen)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if exchange_button.rect.collidepoint(mouse_pos):
+                        all_sprites.remove(exchange_button)
+                        print('goldore bought')
+                        player_goldore += gold.gold_amount
+                        player_gold -= gold.gold_total
+                        gold.gold_amount = 0
+
+            if charcoal.charcoal_amount > 0:
+                all_sprites.add(exchange_button)
+                all_sprites.update()
+                all_sprites.draw(screen)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if exchange_button.rect.collidepoint(mouse_pos):
+                        all_sprites.remove(exchange_button)
+                        print('charcoal bought')
+                        player_charcoal += charcoal.charcoal_amount
+                        player_gold -= charcoal.charcoal_total
+                        charcoal.charcoal_amount = 0
+
+            
+            if exchange.rect.collidepoint(mouse_pos):
+                screen.blit(enter_exchange_banner, mouse_pos)
+           
+
+            exit_tile.update()
+            exit_tile.draw(screen)
+            wood.draw_wood()
+            stone.draw_stone()
+            iron.draw_iron()
+            gold.draw_gold()
+            charcoal.draw_charcoal()
+
+
+            total_cost_text = self.font_2.render(str(total_cost), True, ('black'))
+            screen.blit(total_cost_text, (210, 415))
+
+            pygame.display.update()
+
+    def exchange_screen(self):
+        pygame.display.set_caption("THE WOODSMAN - Exchange")
+        exit = Clickable(100, 540, exit_img2)
+        exchange_button_2 = Clickable(100, 399, exchange_button_img)
+        silver = ExchangeControls(120, 164)
+        copper = ExchangeControls(120, 325)
+
+        def text(self):
+            self.font = pygame.font.SysFont('forte', 35)
+            self.player_copper_text = self.font.render(str(player_copper), True, ('black'))
+            self.player_silver_text = self.font.render(str(player_silver), True, ('black'))
+            self.player_gold_text = self.font.render(str(player_gold), True, ('black'))
+            screen.blit(self.player_copper_text, (40,485))
+            screen.blit(self.player_silver_text, (120,485))
+            screen.blit(self.player_gold_text, (200,485))
+
+        exchange_running = True
+        while exchange_running:
+            global player_copper, player_silver, player_gold, player_copper, player_silver, player_gold, copper_ex_amount, silver_ex_amount
+            screen.blit(exchange_sidebar,(-2,1))
+            text(self)
+            silver.update()
+            copper.update()
+            exit.draw(screen)
+            silver.draw()
+            copper.draw()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exchange_running = False
+                    quit()
+                mouse_pos = pygame.mouse.get_pos() 
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if exit.rect.collidepoint(mouse_pos):
+                        all_sprites.remove(exchange_button_2)
+                        copper_ex_amount = 0
+                        silver_ex_amount = 0
+                        exchange_running = False
+                        self.change_state('village_screen')
+                          
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if copper.buy_more_rect.collidepoint(mouse_pos):
+                        copper_ex_amount += 10
+                        if player_copper <= 0:
+                            player_copper = 0
+                        if copper_ex_amount >= player_copper:
+                            copper_ex_amount = player_copper
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if copper.buy_less_rect.collidepoint(mouse_pos):
+                        copper_ex_amount -= 10
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if silver.buy_more_rect.collidepoint(mouse_pos):
+                        silver_ex_amount += 10
+                        if silver_ex_amount >= player_silver:
+                            silver_ex_amount = player_silver
+                        if player_silver <= 0:
+                            player_silver = 0
+                            
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if silver.buy_less_rect.collidepoint(mouse_pos):
+                        silver_ex_amount -= 10
+
+                if copper_ex_amount <= 0:
+                    copper_ex_amount = 0
+    
+                if silver_ex_amount <= 0:
+                    silver_ex_amount = 0
+               
+            if copper_ex_amount > 0:
+                all_sprites.add(exchange_button_2)
+                all_sprites.update()
+                all_sprites.draw(screen)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if exchange_button_2.rect.collidepoint(mouse_pos):
+                        all_sprites.remove(exchange_button_2)
+                        print('ok')
+                        player_silver += copper.silver_recieved
+                        player_copper -= copper_ex_amount
+                        copper_ex_amount = 0
+
+            if silver_ex_amount > 0:
+                all_sprites.add(exchange_button_2)
+                all_sprites.update()
+                all_sprites.draw(screen)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if exchange_button_2.rect.collidepoint(mouse_pos):
+                        all_sprites.remove(exchange_button_2)
+                        print('ok')
+                        player_gold += silver.gold_recieved
+                        player_silver -= silver_ex_amount
+                        silver_ex_amount = 0
+            
+            pygame.display.update()
+
+    def encounter_screen(self):
+        global player_health, player_health_max, player_copper, player_silver, player_gold, enemy_health
+        pygame.display.set_caption("THE WOODSMAN - Encounter")
+        screen.blit(attack_msg, (0,0))
+        pygame.display.update()
+        pygame.time.delay(2000)
+        screen.blit(encounter_bg, (0,0))
+        attack_button = Clickable(360,300, attack_button_img )
+        exit_button = Clickable(350, 500, exit_img2)
+
+
+        def player_healthbar():
+            health_container_rect = health_container_img.get_rect(topleft = (148,523))
+            health_bar_img = pygame.Surface([36,(28/player_health_max * player_health)])
+            health_bar_bg_img = pygame.Surface([36,36])
+            health_bar_img_rect = health_bar_img.get_rect(midbottom = (166,555))
+            health_bar_bg_img.fill('white')
+            health_bar_img.fill('red')
+            screen.blit(health_bar_bg_img, (148, 523))
+            screen.blit(health_bar_img, (health_bar_img_rect))
+            screen.blit(health_container_img, health_container_rect)
+        
+        encounter_running = True
+        while encounter_running:
+            all_sprites.add(attack_button, exit_button)
+            left_hand_weapon.add(dagger_test)
+            for event in pygame.event.get():
+                mouse_pos = pygame.mouse.get_pos()
+                if event.type == pygame.QUIT:
+                    encounter_running = False
+                    pygame.quit()
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    if exit_button.rect.collidepoint(mouse_pos):
+                        all_sprites.empty()
+                        encounter_running = False
+                        player_health -= 1
+                        print(player_health)
+                        self.change_state('main_screen')
+                    if attack_button.rect.collidepoint(mouse_pos):
+                        enemy_health -= dagger.attack
+                        screen.blit(blood, (random.randrange(560,600), random.randrange(180,250)))
+                        print(enemy_health)
+
+                if enemy_health <= 0:
+                    screen.blit(you_win, (300,250))
+                    pygame.display.update()
+                    pygame.time.delay(3000)
+                    encounter_running = False
+                    all_sprites.empty()
+                    enemy_health += 2
+                    player_copper += random.randrange(1,20)
+                    player_silver += random.randrange(0,2)
+                    self.change_state('main_screen')
+
+            all_sprites.update()
+            all_sprites.draw(screen)
+            player_healthbar()
+            pygame.display.update()
+    
+    def exit_screen(self):
+        global run
+        pygame.display.set_caption("Exit Screen")
+        screen.fill((0, 0, 0))
+        screen.blit(exit_bg, (0,0))
+        exit_running = True
+        while exit_running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    quit()
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    exit_running = False
+                    pygame.quit()
+                    sys.exit()
+            
+            pygame.display.update()
+
+game_state = GameState()
+
+run = True
+while run:
+    game_state.state_manager()
+
+pygame.quit()
+sys.exit()
