@@ -1,3 +1,6 @@
+# To download the image files please follow the link below
+# https://www.dropbox.com/scl/fo/mrbuo5wtzreq9trznssa9/h?rlkey=zg9mvkso9rtv7j7p56r7zskm9&dl=0
+
 import pygame
 import random
 pygame.init()
