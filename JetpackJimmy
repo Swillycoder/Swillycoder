@@ -1,3 +1,7 @@
+# To download image files use the link below
+# https://www.dropbox.com/scl/fo/urg7q3raxin7b2w53cd96/h?rlkey=72q9ng2k53bl7naqok5wj4o56&dl=0
+
+
 # Finish off the colour selection screen, make a list within a list
 # create sprites in GIMP
 # map sprites to the selected colour
@@ -16,7 +20,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Jetpack Jimmy")
 clock = pygame.time.Clock()
 #Load files
-jetpack_l_80px = pygame.image.load('jetpack_l_80px.png')
+jetpack_l_80px = pygame.image.load('jetpack_l_80px.png')convert_alpha()
 jetpack_r_80px = pygame.image.load('jetpack_r_80px.png')
 #Jimmy colours
 #jimmy_redl = pygame.image.load('jimmy_redl.png')
