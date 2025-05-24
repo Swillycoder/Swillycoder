@@ -1,5 +1,5 @@
 - 👋 Hi, I’m @Swillycoder
-- 👀 I’m interested in Python, Pygame specifically
+- 👀 I’m interested in JavaScript canvas and Web3 integration
 - 🌱 I’m currently learning Python and Java
 - 💞️ I’m looking to collaborate on Games and Web3
 - 📫 How to reach me. samperryinbox@gmail.com
